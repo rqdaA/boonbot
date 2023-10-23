@@ -15,7 +15,7 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 logger = logging.getLogger(__name__)
 
-SOLVED_POSTFIX = " (solved)"
+SOLVED_SUFFIX = " (solved)"
 CHECK_EMOJI = "✅"
 ERROR_EMOJI = "😡"
 
