@@ -1,7 +1,7 @@
 import discord
 from .main import tree, CHECK_EMOJI
 from .config import config
-from .util import check_is_in_bot_cmd, check_is_in_thread
+from .util import check_is_in_bot_cmd, check_is_in_contest_channel
 
 PERMISSION_ALLOW = discord.PermissionOverwrite(read_messages=None, manage_channels=None)
 PERMISSION_DENY = discord.PermissionOverwrite(read_messages=False, manage_channels=False)
@@ -10,11 +10,11 @@ PERMISSION_DENY = discord.PermissionOverwrite(read_messages=False, manage_channe
 @tree.command(name="leave", description="現在のCTFチャンネルから離脱します")
 async def leave(ctx: discord.Interaction, channel: discord.TextChannel = None):
     if channel:
-        if check_is_in_bot_cmd(ctx):
+        if not await check_is_in_bot_cmd(ctx):
             return
         await channel.set_permissions(ctx.user, overwrite=PERMISSION_DENY)
     else:
-        if check_is_in_thread(ctx):
+        if not await check_is_in_contest_channel(ctx):
             return
         await ctx.channel.set_permissions(ctx.user, overwrite=PERMISSION_DENY)
     await ctx.response.send_message(f'{CHECK_EMOJI}')
@@ -22,8 +22,9 @@ async def leave(ctx: discord.Interaction, channel: discord.TextChannel = None):
 
 @tree.command(name="join", description="CTFチャンネルに復帰します")
 async def join(ctx: discord.Interaction, channel: str):
-    if check_is_in_bot_cmd(ctx):
+    if not await check_is_in_bot_cmd(ctx):
         return
+
     target = list(filter(lambda ch: ch.name == channel, [ch for ch in ctx.guild.channels]))
     if not target:
         await ctx.response.send_message(f'404 🥲')
