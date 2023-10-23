@@ -1,7 +1,7 @@
 import discord
 from .main import tree, CHECK_EMOJI
 from .config import config
-from util import check_is_in_bot_cmd
+from .util import check_is_in_bot_cmd
 
 
 @tree.command(name="new-ctf", description="新しいCTFチャンネルを作成します")

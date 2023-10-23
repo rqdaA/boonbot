@@ -47,3 +47,7 @@ async def check_is_in_bot_cmd(ctx: discord.Interaction):
                                         ephemeral=True)
         return False
     return True
+
+
+async def ratelimit_error(ctx: discord.Interaction):
+    await ctx.response.send_message(f"レート制限だよ！", ephemeral=True)

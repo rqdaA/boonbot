@@ -1,7 +1,7 @@
 import enum
 
 import discord
-from discord import Thread, TextChannel
+from discord import Thread, TextChannel, HTTPException
 
 from . import util
 from .main import tree
@@ -38,7 +38,10 @@ async def rename_chall(ctx: discord.Interaction, category: Categories, problem_n
     if not util.check_is_in_contest_channel(ctx) or not util.check_channel_exists(ctx, channel_name):
         return
     await ctx.response.send_message("✅")
-    await ctx.channel.edit(name=channel_name)
+    try:
+        await ctx.channel.edit(name=channel_name)
+    except HTTPException:
+        await util.ratelimit_error(ctx)
 
 
 @tree.command(name="solved", description="スレッドをsolved状態にします")
@@ -46,7 +49,10 @@ async def solved(ctx: discord.Interaction):
     if not util.check_is_in_thread(ctx) or not util.check_is_unsolved(ctx):
         return
     await ctx.response.send_message("Congratulations!")
-    await ctx.channel.edit(name=ctx.channel.name + SOLVED_POSTFIX)
+    try:
+        await ctx.channel.edit(name=ctx.channel.name + SOLVED_POSTFIX)
+    except HTTPException:
+        await util.ratelimit_error(ctx)
 
 
 @tree.command(name="unsolved", description="スレッドをunsolved状態にします")
@@ -54,4 +60,7 @@ async def unsolved(ctx: discord.Interaction):
     if not util.check_is_in_thread(ctx) or not util.check_is_solved(ctx):
         return
     await ctx.response.send_message("✅")
-    await ctx.channel.edit(name=ctx.channel.name.removesuffix(SOLVED_POSTFIX))
+    try:
+        await ctx.channel.edit(name=ctx.channel.name.removesuffix(SOLVED_POSTFIX))
+    except HTTPException:
+        await util.ratelimit_error(ctx)
