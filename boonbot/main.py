@@ -22,7 +22,7 @@ ERROR_EMOJI = "😡"
 
 
 @tree.command(name="help", description="Botで使えるコマンドを一覧で表示します")
-async def help(ctx: discord.Interaction):
+async def commands_help(ctx: discord.Interaction):
     await ctx.response.send_message(f"""
 ## 利用可能なコマンド一覧
 - help
