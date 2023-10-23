@@ -31,6 +31,25 @@ async def new_ctf(interaction: discord.Interaction, ctf_name: str):
     await interaction.response.send_message(f"creating {ctf_name}", ephemeral=True)
 
 
+@tree.command(
+    name="new-chall",
+    description="新しい問題スレッドを作成します"
+)
+@discord.app_commands.choices(
+    category=[
+        discord.app_commands.Choice(name="Pwnable", value="pwn"),
+        discord.app_commands.Choice(name="Crypto", value="crypto"),
+        discord.app_commands.Choice(name="Web", value="web"),
+        discord.app_commands.Choice(name="Reversing", value="rev")
+    ]
+)
+async def new_chall(ctx: discord.Interaction, category: str, problem_name: str):
+    channel_name = f"{category}-{problem_name}"
+    thread = await ctx.channel.create_thread(name=channel_name)
+    await ctx.channel.send(f"スレッドを作成したよ！: {thread.mention}")
+    await thread.send("こんにちは")
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument("--token", type=str, required=True)
