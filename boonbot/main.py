@@ -45,10 +45,15 @@ async def new_ctf(interaction: discord.Interaction, ctf_name: str):
 )
 async def new_chall(ctx: discord.Interaction, category: str, problem_name: str):
     channel_name = f"{category}-{problem_name}"
-    thread = await ctx.channel.create_thread(name=channel_name)
-    await ctx.channel.send(f"スレッドを作成したよ！: {thread.mention}")
-    await thread.send("こんにちは")
+    thread = await ctx.channel.create_thread(name=channel_name, reason="あああ")
+    await ctx.response.send_message(f"スレッドを作成したよ！: {thread.mention}")
 
+
+@tree.command(
+    name="solved"
+)
+async def solved(ctx: discord.Interaction):
+    print(ctx.channel)
 
 def main():
     parser = ArgumentParser()
