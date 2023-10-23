@@ -1,0 +1,10 @@
+version '3'
+services:
+  boonbot:
+    build: .
+    restart: always
+    environment:
+      - TOKEN=${TOKEN}
+      - GUILD_ID=${GUILD_ID}
+      - BOT_CHANNEL_ID=${BOT_CHANNEL_ID}
+      - CONTESTS_ID=${CONTESTS_ID}
