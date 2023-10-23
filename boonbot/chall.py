@@ -8,15 +8,15 @@ from .main import tree, CHECK_EMOJI, SOLVED_PREFIX
 
 
 class Categories(enum.Enum):
-    WEB = "web"
-    CRYPTO = "crypto"
-    REVERSING = "rev"
-    FORENSIC = "forensic"
-    PWNABLE = "pwn"
-    MISC = "misc"
-    BLOCKCHAIN = "blockchain"
-    OSINT = "osint"
-    PROGRAMMING = "ppc"
+    web = "web"
+    crypto = "crypto"
+    rev = "rev"
+    forensic = "forensic"
+    pwn = "pwn"
+    misc = "misc"
+    blockchain = "blockchain"
+    osint = "osint"
+    ppc = "ppc"
 
 
 @tree.command(name="new-chall", description="問題スレッドを作成します")
