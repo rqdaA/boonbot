@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--token", type=str, required=True)
     parser.add_argument("--guild-id", type=int, required=True)
     parser.add_argument("--bot-channel-id", type=int, required=True)
-    parser.add_argument('--contests_category_id', type=int, required=True)
+    parser.add_argument('--contests-category-id', type=int, required=True)
     res = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, force=True)
