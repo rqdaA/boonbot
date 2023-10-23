@@ -4,7 +4,7 @@ from .config import config
 from .util import check_is_in_bot_cmd
 
 
-@tree.command(name="new-ctf", description="新しいCTFチャンネルを作成します")
+@tree.command(name="new-ctf", description="新しいコンテストチャンネルを作成します")
 async def new_ctf(ctx: discord.Interaction, ctf_name: str):
     if not await check_is_in_bot_cmd(ctx):
         return

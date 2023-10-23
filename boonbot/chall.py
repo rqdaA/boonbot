@@ -1,14 +1,9 @@
 import enum
 
 import discord
-from discord import Thread, TextChannel, HTTPException, RateLimited, app_commands
 
 from . import util
-from .main import tree
-from .config import config
-
-
-SOLVED_POSTFIX = " (solved)"
+from .main import tree, CHECK_EMOJI, SOLVED_POSTFIX
 
 
 class Categories(enum.Enum):
@@ -29,7 +24,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(ctx, ctx.channel, channel_name):
         return
     thread = await ctx.channel.create_thread(name=channel_name, auto_archive_duration=10080)
-    await ctx.response.send_message(f"問題スレッドを作成しました ✅ {thread.mention}")
+    await ctx.response.send_message(f"問題スレッドを作成しました {CHECK_EMOJI} {thread.mention}")
 
 
 @tree.command(name="rename-chall", description="問題名を変更します")

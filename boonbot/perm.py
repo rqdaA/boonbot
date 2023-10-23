@@ -7,7 +7,7 @@ PERMISSION_ALLOW = discord.PermissionOverwrite(read_messages=None, manage_channe
 PERMISSION_DENY = discord.PermissionOverwrite(read_messages=False, manage_channels=False)
 
 
-@tree.command(name="leave", description="現在のCTFチャンネルから離脱します")
+@tree.command(name="leave", description="現在のコンテストチャンネルから離脱します")
 async def leave(ctx: discord.Interaction, channel: discord.TextChannel = None):
     if channel:
         if not await check_is_in_bot_cmd(ctx):
@@ -20,7 +20,7 @@ async def leave(ctx: discord.Interaction, channel: discord.TextChannel = None):
     await ctx.response.send_message(f'{CHECK_EMOJI}')
 
 
-@tree.command(name="join", description="CTFチャンネルに復帰します")
+@tree.command(name="join", description="コンテストチャンネルに復帰します")
 async def join(ctx: discord.Interaction, channel: str):
     if not await check_is_in_bot_cmd(ctx):
         return

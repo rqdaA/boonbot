@@ -7,7 +7,7 @@ from .config import config
 
 async def check_is_in_contest_channel(ctx: discord.Interaction):
     if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id != config.contests_category_id:
-        await ctx.response.send_message(f"コンテストチャンネルじゃないよ！", ephemeral=True)
+        await ctx.response.send_message(f"ここはコンテストチャンネルじゃないよ！", ephemeral=True)
         return False
     return True
 
@@ -22,14 +22,14 @@ async def check_channel_exists(ctx: discord.Interaction, parent: TextChannel, ch
 
 async def check_is_in_thread(ctx: discord.Interaction):
     if not isinstance(ctx.channel, Thread) or ctx.channel.category_id != config.contests_category_id:
-        await ctx.response.send_message(f"問題スレッドじゃないよ！", ephemeral=True)
+        await ctx.response.send_message(f"ここは問題スレッドじゃないよ！", ephemeral=True)
         return False
     return True
 
 
 async def check_is_unsolved(ctx: discord.Interaction):
     if ctx.channel.name.endswith(SOLVED_POSTFIX):
-        await ctx.response.send_message(f"もうsolvedだよ！", ephemeral=True)
+        await ctx.response.send_message(f"すでにsolvedだよ！", ephemeral=True)
         return False
     return True
 
