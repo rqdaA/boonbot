@@ -35,7 +35,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
 @tree.command(name="rename-chall", description="問題名を変更します")
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.name}: {problem_name}"
-    if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(ctx, channel_name):
+    if not await util.check_is_in_thread(ctx) or not await util.check_channel_exists(ctx, channel_name):
         return
     await ctx.response.send_message("✅")
     await ctx.channel.edit(name=channel_name)
