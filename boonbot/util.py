@@ -41,4 +41,9 @@ async def check_is_solved(ctx: discord.Interaction):
     return True
 
 
-
+async def check_is_in_bot_cmd(ctx: discord.Interaction):
+    if ctx.channel.id != config.bot_channel_id:
+        await ctx.response.send_message(f"{ctx.guild.get_channel(config.bot_channel_id).mention} で実行してね！",
+                                        ephemeral=True)
+        return False
+    return True
