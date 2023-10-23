@@ -3,6 +3,7 @@ import enum
 import discord
 from discord import Thread, TextChannel
 
+from . import util
 from .main import tree
 from .config import config
 
@@ -24,39 +25,25 @@ class Categories(enum.Enum):
 
 @tree.command(name="new-chall")
 async def new_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
-    if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id != config.contests_category_id:
-        await ctx.response.send_message(f"コンテストチャンネルじゃないよ！", ephemeral=True)
-        return
     channel_name = f"{category.name}: {problem_name}"
-    for channel in ctx.channel.threads:
-        if channel.name.removesuffix(SOLVED_POSTFIX) == channel_name:
-            await ctx.response.send_message(f"すでに存在するよ！", ephemeral=True)
-            return
+    if not util.check_is_in_contest_channel(ctx) or not util.check_channel_exists(ctx, channel_name):
+        return
     thread = await ctx.channel.create_thread(name=channel_name, auto_archive_duration=10080)
     await ctx.response.send_message(f"✅ {thread.mention}")
 
 
 @tree.command(name="rename-chall")
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
-    if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id != config.contests_category_id:
-        await ctx.response.send_message(f"コンテストチャンネルじゃないよ！", ephemeral=True)
-        return
     channel_name = f"{category.name}: {problem_name}"
-    for channel in ctx.channel.threads:
-        if channel.name.removesuffix(SOLVED_POSTFIX) == channel_name:
-            await ctx.response.send_message(f"すでに存在するよ！", ephemeral=True)
-            return
+    if not util.check_is_in_contest_channel(ctx) or not util.check_channel_exists(ctx, channel_name):
+        return
     await ctx.response.send_message("✅")
     await ctx.channel.edit(name=channel_name)
 
 
 @tree.command(name="solved")
 async def solved(ctx: discord.Interaction):
-    if not isinstance(ctx.channel, Thread) or ctx.channel.category_id != config.contests_category_id:
-        await ctx.response.send_message(f"問題スレッドじゃないよ！", ephemeral=True)
-        return
-    if ctx.channel.name.endswith(SOLVED_POSTFIX):
-        await ctx.response.send_message(f"もうsolvedだよ！", ephemeral=True)
+    if not util.check_is_in_thread(ctx) or not util.check_is_unsolved(ctx):
         return
     await ctx.response.send_message("Congratulations!")
     await ctx.channel.edit(name=ctx.channel.name + SOLVED_POSTFIX)
@@ -64,11 +51,7 @@ async def solved(ctx: discord.Interaction):
 
 @tree.command(name="unsolved")
 async def unsolved(ctx: discord.Interaction):
-    if not isinstance(ctx.channel, Thread) or ctx.channel.category_id != config.contests_category_id:
-        await ctx.response.send_message(f"問題スレッドじゃないよ！", ephemeral=True)
-        return
-    if not ctx.channel.name.endswith(SOLVED_POSTFIX):
-        await ctx.response.send_message(f"まだsolvedじゃないよ！", ephemeral=True)
+    if not util.check_is_in_thread(ctx) or not util.check_is_solved(ctx):
         return
     await ctx.response.send_message("✅")
     await ctx.channel.edit(name=ctx.channel.name.removesuffix(SOLVED_POSTFIX))
