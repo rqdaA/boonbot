@@ -26,9 +26,9 @@ async def on_ready():
     await tree.sync()
 
 
-@tree.command(name="test", description="this is test")
-async def test_command(interaction: discord.Interaction, text: str):
-    await interaction.response.send_message("てすと！", ephemeral=True)
+@tree.command(name="new-ctf", description="新しいCTFチャンネルを作成します")
+async def new_ctf(interaction: discord.Interaction, ctf_name: str):
+    await interaction.response.send_message(f"creating {ctf_name}", ephemeral=True)
 
 
 def main():
