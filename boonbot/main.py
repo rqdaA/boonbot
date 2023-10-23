@@ -20,6 +20,21 @@ PIN_EMOJI = "📌"
 CHECK_EMOJI = "✅"
 
 
+@tree.command(name="help", description="Botで使えるコマンドを一覧で表示します")
+async def help(ctx: discord.Interaction):
+    await ctx.response.send_message(f"""
+## 利用可能なコマンド一覧
+- help
+- new-ctf
+- new-chall 
+- rename-chall
+- join
+- leave
+- solved
+- unsolved
+""", ephemeral=True)
+
+
 @client.event
 async def on_ready():
     await tree.sync()
