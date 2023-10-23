@@ -4,7 +4,7 @@ import discord
 
 from . import util
 from .config import config
-from .main import tree, CHECK_EMOJI, SOLVED_SUFFIX
+from .main import tree, CHECK_EMOJI, SOLVED_PREFIX
 
 
 class Categories(enum.Enum):
@@ -44,7 +44,7 @@ async def solved(ctx: discord.Interaction):
     if not await util.check_is_in_thread(ctx) or not await util.check_is_unsolved(ctx):
         return
     await ctx.response.send_message(":tensai:")
-    await ctx.channel.edit(name=ctx.channel.name + SOLVED_SUFFIX)
+    await ctx.channel.edit(name=SOLVED_PREFIX + ctx.channel.name)
 
 
 @tree.command(name="unsolved", description="スレッドをunsolved状態にします")
@@ -52,7 +52,7 @@ async def unsolved(ctx: discord.Interaction):
     if not await util.check_is_in_thread(ctx) or not await util.check_is_solved(ctx):
         return
     await ctx.response.send_message(":cry:")
-    await ctx.channel.edit(name=ctx.channel.name.removesuffix(SOLVED_SUFFIX))
+    await ctx.channel.edit(name=ctx.channel.name.removeprefix(SOLVED_PREFIX))
 
 
 @tree.command(name="new-ctf", description="新しいコンテストチャンネルを作成します")
