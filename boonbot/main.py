@@ -1,7 +1,8 @@
 import logging
+from argparse import ArgumentParser
+
 import discord
 from discord import app_commands
-from argparse import ArgumentParser
 
 from .config import config
 

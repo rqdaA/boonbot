@@ -1,9 +1,8 @@
 import discord
 from discord import TextChannel, Thread
 
-from .chall import SOLVED_POSTFIX
 from .config import config
-from .main import ERROR_EMOJI
+from .main import ERROR_EMOJI, SOLVED_SUFFIX
 
 
 async def check_is_in_contest_channel(ctx: discord.Interaction):
@@ -15,7 +14,7 @@ async def check_is_in_contest_channel(ctx: discord.Interaction):
 
 async def check_channel_exists(ctx: discord.Interaction, parent: TextChannel, channel_name: str):
     for channel in parent.threads:
-        if channel.name.removesuffix(SOLVED_POSTFIX) == channel_name:
+        if channel.name.removesuffix(SOLVED_SUFFIX) == channel_name:
             await ctx.response.send_message(f"すでに存在するよ！{ERROR_EMOJI}", ephemeral=True)
             return False
     return True
@@ -29,14 +28,14 @@ async def check_is_in_thread(ctx: discord.Interaction):
 
 
 async def check_is_unsolved(ctx: discord.Interaction):
-    if ctx.channel.name.endswith(SOLVED_POSTFIX):
+    if ctx.channel.name.endswith(SOLVED_SUFFIX):
         await ctx.response.send_message(f"すでにsolvedだよ！{ERROR_EMOJI}", ephemeral=True)
         return False
     return True
 
 
 async def check_is_solved(ctx: discord.Interaction):
-    if not ctx.channel.name.endswith(SOLVED_POSTFIX):
+    if not ctx.channel.name.endswith(SOLVED_SUFFIX):
         await ctx.response.send_message(f"まだsolvedじゃないよ！{ERROR_EMOJI}", ephemeral=True)
         return False
     return True
@@ -44,8 +43,9 @@ async def check_is_solved(ctx: discord.Interaction):
 
 async def check_is_in_bot_cmd(ctx: discord.Interaction):
     if ctx.channel.id != config.bot_channel_id:
-        await ctx.response.send_message(f"{ctx.guild.get_channel(config.bot_channel_id).mention} で実行してね！{ERROR_EMOJI}",
-                                        ephemeral=True)
+        await ctx.response.send_message(
+            f"{ctx.guild.get_channel(config.bot_channel_id).mention} で実行してね！{ERROR_EMOJI}",
+            ephemeral=True)
         return False
     return True
 
