@@ -1,6 +1,7 @@
 import enum
 
 import discord
+from discord import ChannelType
 
 from . import util
 from .config import config
@@ -25,7 +26,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(ctx, ctx.channel,
                                                                                               channel_name):
         return
-    thread = await ctx.channel.create_thread(name=channel_name, auto_archive_duration=10080)
+    thread = await ctx.channel.create_thread(name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080)
     await ctx.response.send_message(f"{thread.mention}を作成しました {CHECK_EMOJI} ")
 
 
