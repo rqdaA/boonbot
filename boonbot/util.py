@@ -12,8 +12,8 @@ async def check_is_in_contest_channel(ctx: discord.Interaction):
     return True
 
 
-async def check_channel_exists(ctx: discord.Interaction, channel_name: str):
-    for channel in ctx.channel.threads:
+async def check_channel_exists(ctx: discord.Interaction, parent: TextChannel, channel_name: str):
+    for channel in parent.threads:
         if channel.name.removesuffix(SOLVED_POSTFIX) == channel_name:
             await ctx.response.send_message(f"すでに存在するよ！", ephemeral=True)
             return False
