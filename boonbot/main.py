@@ -28,21 +28,14 @@ async def on_ready():
 def main():
     parser = ArgumentParser()
     parser.add_argument("--token", type=str, required=True)
-    # parser.add_argument("--guild-id", type=int, required=True)
-    # parser.add_argument("--bot-channel-id", type=int, required=True)
-    # parser.add_argument("--bot-role-ids", nargs="+", type=int, required=True)
-    # parser.add_argument("--member-role-ids", nargs="+", type=int, required=True)
-    # parser.add_argument("--special-category-ids", nargs="+", type=int, required=True)
-    # parser.add_argument("--main-channel-name", type=str, default="main")
+    parser.add_argument("--guild-id", type=int, required=True)
+    parser.add_argument("--bot-channel-id", type=int, required=True)
+    parser.add_argument('--contests_category_id', type=int, required=True)
     res = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, force=True)
-    # config.guild_id = res.guild_id
-    # config.bot_channel_id = res.bot_channel_id
-    # config.main_channel_name = res.main_channel_name
-    # config.bot_role_ids = res.bot_role_ids
-    # config.member_role_ids = res.member_role_ids
-    # config.special_category_ids = res.special_category_ids
+    config.guild_id = res.guild_id
+    config.bot_channel_id = res.bot_channel_id
+    config.contests_category_id = res.contests_category_id
 
     client.run(res.token)
-    # bot.run(res.token)
