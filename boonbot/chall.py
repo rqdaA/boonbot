@@ -33,6 +33,15 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
     await ctx.response.send_message(f"✅ {thread.mention}")
 
 
+@new_chall.autocomplete("problem_name")
+async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
+    print(current)
+    return [
+        discord.app_commands.Choice(name="hello1", value="1"),
+        discord.app_commands.Choice(name="hello2", value="2")
+    ]
+
+
 @tree.command(name="rename-chall")
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.name}: {problem_name}"
