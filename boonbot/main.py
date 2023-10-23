@@ -28,7 +28,9 @@ async def on_ready():
 
 @tree.command(name="new-ctf", description="新しいCTFチャンネルを作成します")
 async def new_ctf(interaction: discord.Interaction, ctf_name: str):
-    await interaction.response.send_message(f"creating {ctf_name}", ephemeral=True)
+    channel = await interaction.guild.create_text_channel(ctf_name,
+                                                          category=interaction.guild.get_channel(1166000686975172690))
+    await interaction.response.send_message(f'新しいCTFを作成しました。 {channel.mention}')
 
 
 @tree.command(
@@ -45,15 +47,10 @@ async def new_ctf(interaction: discord.Interaction, ctf_name: str):
 )
 async def new_chall(ctx: discord.Interaction, category: str, problem_name: str):
     channel_name = f"{category}-{problem_name}"
-    thread = await ctx.channel.create_thread(name=channel_name, reason="あああ")
-    await ctx.response.send_message(f"スレッドを作成したよ！: {thread.mention}")
+    thread = await ctx.channel.create_thread(name=channel_name)
+    await ctx.channel.send(f"スレッドを作成したよ！: {thread.mention}")
+    await thread.send("こんにちは")
 
-
-@tree.command(
-    name="solved"
-)
-async def solved(ctx: discord.Interaction):
-    print(ctx.channel)
 
 def main():
     parser = ArgumentParser()
