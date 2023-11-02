@@ -26,8 +26,9 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(ctx, ctx.channel,
                                                                                               channel_name):
         return
-    thread = await ctx.channel.create_thread(name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080)
-    await ctx.response.send_message(f"{thread.mention}を作成しました {CHECK_EMOJI} ")
+    await ctx.response.defer(ephemeral=True)
+    await ctx.channel.create_thread(name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080)
+    await ctx.delete_original_response()
 
 
 @tree.command(name="rename-chall", description="問題名を変更します")
