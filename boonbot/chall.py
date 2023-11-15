@@ -45,7 +45,7 @@ async def rename_chall(ctx: discord.Interaction, category: Categories, problem_n
 async def solved(ctx: discord.Interaction):
     if not await util.check_is_in_thread(ctx) or not await util.check_is_unsolved(ctx):
         return
-    await ctx.response.send_message(":tensai:")
+    await ctx.response.send_message("<:tensai:1096701452078022707>")
     await ctx.channel.edit(name=SOLVED_PREFIX + ctx.channel.name)
 
 
