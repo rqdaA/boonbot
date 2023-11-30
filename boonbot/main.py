@@ -23,7 +23,8 @@ ERROR_EMOJI = "😡"
 
 @tree.command(name="help", description="Botで使えるコマンドを一覧で表示します")
 async def commands_help(ctx: discord.Interaction):
-    await ctx.response.send_message(f"""
+    await ctx.response.send_message(
+        f"""
 ## 利用可能なコマンド一覧
 - help
 - new-ctf
@@ -33,7 +34,9 @@ async def commands_help(ctx: discord.Interaction):
 - leave
 - solved
 - unsolved
-""", ephemeral=True)
+""",
+        ephemeral=True,
+    )
 
 
 @client.event
@@ -46,7 +49,7 @@ def main():
     parser.add_argument("--token", type=str, required=True)
     parser.add_argument("--guild-id", type=int, required=True)
     parser.add_argument("--bot-channel-id", type=int, required=True)
-    parser.add_argument('--contests-category-id', type=int, required=True)
+    parser.add_argument("--contests-category-id", type=int, required=True)
     res = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, force=True)
