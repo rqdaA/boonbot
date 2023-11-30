@@ -73,6 +73,7 @@ async def whitelist(
         mentions = " ".join({member.mention for member in target_members if member not in current_members})
         await ctx.response.send_message(f"{mentions}をホワイトリストに追加しました")
 
+
 @join.autocomplete("channel")
 async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
     contests = ctx.guild.get_channel(config.contests_category_id).channels
