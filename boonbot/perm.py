@@ -42,12 +42,12 @@ async def join(ctx: discord.Interaction, channel: str):
 
 @tree.command(name="whitelist", description="チャンネルを閲覧できるメンバーを制限します")
 async def whitelist(
-        ctx: discord.Interaction,
-        u1: discord.Member,
-        u2: discord.Member = None,
-        u3: discord.Member = None,
-        u4: discord.Member = None,
-        u5: discord.Member = None,
+    ctx: discord.Interaction,
+    u1: discord.Member,
+    u2: discord.Member = None,
+    u3: discord.Member = None,
+    u4: discord.Member = None,
+    u5: discord.Member = None,
 ):
     if not await check_is_in_contest_channel(ctx):
         return
