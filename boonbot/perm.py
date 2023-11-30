@@ -57,11 +57,11 @@ async def whitelist(
 
     if all([ctx.channel.overwrites_for(member).read_messages is None for member in non_bot_guild_member]):
         # Channel is Not Whitelisted
+        mentions = " ".join({user.mention for user in target_members})
+        await ctx.response.send_message(f"ホワイトリストに変更しました\nメンバー:{mentions}")
         for member in non_bot_guild_member:
             if member not in target_members:
                 await ctx.channel.set_permissions(member, overwrite=PERMISSION_DENY)
-        mentions = " ".join({user.mention for user in target_members})
-        await ctx.response.send_message(f"ホワイトリストに変更しました\nメンバー:{mentions}")
     else:
         # Channel is Already Whitelisted
         if all([member in current_members for member in target_members]):
@@ -72,7 +72,6 @@ async def whitelist(
             await ctx.channel.set_permissions(member, overwrite=PERMISSION_ALLOW)
         mentions = " ".join({member.mention for member in target_members if member not in current_members})
         await ctx.response.send_message(f"{mentions}をホワイトリストに追加しました")
-
 
 @join.autocomplete("channel")
 async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
