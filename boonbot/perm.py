@@ -42,25 +42,26 @@ async def join(ctx: discord.Interaction, channel: str):
 
 @tree.command(name="whitelist", description="チャンネルを閲覧できるメンバーを制限します")
 async def whitelist(
-    ctx: discord.Interaction,
-    u1: discord.Member,
-    u2: discord.Member = None,
-    u3: discord.Member = None,
-    u4: discord.Member = None,
-    u5: discord.Member = None,
+        ctx: discord.Interaction,
+        u1: discord.Member,
+        u2: discord.Member = None,
+        u3: discord.Member = None,
+        u4: discord.Member = None,
+        u5: discord.Member = None,
 ):
     if not await check_is_in_contest_channel(ctx):
         return
 
     non_bot_member = [member for member in ctx.guild.members if not member.bot]
     current_members = list(filter(lambda u: ctx.channel.overwrites_for(u).read_messages, non_bot_member))
-    target_members = list(filter(lambda u: u is not None, [ctx.user, u1, u2, u3, u4, u5]))
+    admins = [member for member in ctx.guild.members if not member.guild_permissions.administrator]
+    target_members = list(filter(lambda u: u is not None, [ctx.user, u1, u2, u3, u4, u5, *admins]))
 
     if all([ctx.channel.overwrites_for(member).read_messages is None for member in non_bot_member]):
         # Channel is Not Whitelisted
         mentions = " ".join({user.mention for user in target_members})
-        await ctx.channel.set_permissions(ctx.guild.default_role, overwrite=PERMISSION_DENY)
         await ctx.response.send_message(f"ホワイトリストに変更しました\nメンバー:{mentions}")
+        await ctx.channel.set_permissions(ctx.guild.default_role, overwrite=PERMISSION_DENY)
         for member in target_members:
             await ctx.channel.set_permissions(member, overwrite=PERMISSION_WHITE)
     else:
