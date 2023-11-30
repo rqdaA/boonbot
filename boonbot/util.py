@@ -6,20 +6,13 @@ from .main import ERROR_EMOJI, SOLVED_PREFIX
 
 
 async def check_is_in_contest_channel(ctx: discord.Interaction):
-    if (
-        not isinstance(ctx.channel, TextChannel)
-        or ctx.channel.category_id != config.contests_category_id
-    ):
-        await ctx.response.send_message(
-            f"ここはコンテストチャンネルじゃないよ！{ERROR_EMOJI}", ephemeral=True
-        )
+    if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id != config.contests_category_id:
+        await ctx.response.send_message(f"ここはコンテストチャンネルじゃないよ！{ERROR_EMOJI}", ephemeral=True)
         return False
     return True
 
 
-async def check_channel_exists(
-    ctx: discord.Interaction, parent: TextChannel, channel_name: str
-):
+async def check_channel_exists(ctx: discord.Interaction, parent: TextChannel, channel_name: str):
     for channel in parent.threads:
         if channel.name.removeprefix(SOLVED_PREFIX) == channel_name:
             await ctx.response.send_message(f"すでに存在するよ！{ERROR_EMOJI}", ephemeral=True)
@@ -28,10 +21,7 @@ async def check_channel_exists(
 
 
 async def check_is_in_thread(ctx: discord.Interaction):
-    if (
-        not isinstance(ctx.channel, Thread)
-        or ctx.channel.category_id != config.contests_category_id
-    ):
+    if not isinstance(ctx.channel, Thread) or ctx.channel.category_id != config.contests_category_id:
         await ctx.response.send_message(f"ここは問題スレッドじゃないよ！{ERROR_EMOJI}", ephemeral=True)
         return False
     return True
