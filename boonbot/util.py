@@ -1,9 +1,15 @@
+import random
+import string
+
 import discord
 from discord import TextChannel, Thread
 
 from .config import config
 from .main import ERROR_EMOJI, SOLVED_PREFIX
 
+
+def gen_password(length: int):
+    return random.choices(string.ascii_letters + string.digits + string.punctuation, k=length)
 
 async def check_is_in_contest_channel(ctx: discord.Interaction):
     if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id != config.contests_category_id:
