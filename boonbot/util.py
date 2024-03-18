@@ -9,7 +9,7 @@ from .main import ERROR_EMOJI, SOLVED_PREFIX
 
 
 def gen_password(length: int):
-    return ''.join(random.choices(string.ascii_lowercase, k=length))
+    return "".join(random.choices(string.ascii_lowercase, k=length))
 
 
 async def check_is_in_contest_channel(ctx: discord.Interaction):
