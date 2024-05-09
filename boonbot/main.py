@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 SOLVED_PREFIX = "🚩 "
 CHECK_EMOJI = "✅"
 ERROR_EMOJI = "😡"
+RUNNING_EMOJI = "🆙"
 
 
 @tree.command(name="help", description="Botで使えるコマンドを一覧で表示します")

@@ -5,7 +5,7 @@ from discord import ChannelType
 
 from . import util, perm
 from .config import config
-from .main import tree, CHECK_EMOJI, SOLVED_PREFIX, ERROR_EMOJI
+from .main import tree, CHECK_EMOJI, SOLVED_PREFIX, ERROR_EMOJI, RUNNING_EMOJI
 
 
 class Categories(enum.Enum):
@@ -24,7 +24,7 @@ class Categories(enum.Enum):
 async def new_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(
-        ctx, ctx.channel, channel_name
+            ctx, ctx.channel, channel_name
     ):
         return
     await ctx.response.defer(ephemeral=True)
@@ -36,7 +36,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_thread(ctx) or not await util.check_channel_exists(
-        ctx, ctx.channel.parent, channel_name
+            ctx, ctx.channel.parent, channel_name
     ):
         return
     await ctx.response.send_message(f"問題名を変更しました {CHECK_EMOJI}")
@@ -69,30 +69,47 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str):
         overwrites = {ctx.guild.default_role: perm.PERMISSION_DENY, role: perm.PERMISSION_WHITE}
 
         channel = await ctx.guild.create_text_channel(
-            ctf_name, category=ctx.guild.get_channel(category_id), overwrites=overwrites
+            f'{RUNNING_EMOJI}{ctf_name}', category=ctx.guild.get_channel(category_id), overwrites=overwrites
         )
         await channel.send(f"`{util.gen_password(16)}`")
         await ctx.response.send_message(f"{role_name}に{channel.mention}を作成しました {CHECK_EMOJI}")
 
 
-@tree.command(name="end-ctf", description="複数チームで参加しているコンテストの閲覧制限を外します")
+@tree.command(name="unend-ctf", description="コンテストの閲覧制限を再度付けます")
+async def unend_ctf(ctx: discord.Interaction):
+    if not await util.check_is_in_contest_channel(ctx):
+        return
+
+    for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
+        if ch.name.startswith(RUNNING_EMOJI):
+            continue
+        await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DENY)
+        await ch.edit(name=f'{RUNNING_EMOJI}{ch.name}')
+        if ch.id != ctx.channel.id:
+            await ch.send(f"ロール制限を付けました {CHECK_EMOJI}")
+    await ctx.response.send_message(f"ロール制限を付けました {CHECK_EMOJI}")
+
+
+@tree.command(name="end-ctf", description="コンテストの閲覧制限を外します")
 async def end_ctf(ctx: discord.Interaction):
     if not await util.check_is_in_contest_channel(ctx):
         return
 
     for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
+        if not ch.name.startswith(RUNNING_EMOJI):
+            continue
         await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
+        await ch.edit(name=ch.name.lstrip(RUNNING_EMOJI))
         if ch.id != ctx.channel.id:
             await ch.send(f"ロール制限を外しました {CHECK_EMOJI}")
     await ctx.response.send_message(f"ロール制限を外しました {CHECK_EMOJI}")
 
 
 @new_ctf.autocomplete("role_name")
-async def autocomplete(
-    ctx: discord.Interaction, current: str
-) -> list[discord.app_commands.Choice[discord.TextChannel]]:
-    return [
+async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
+    roles = [ctx.guild.get_role(role_id) for role_id in config.team_role_ids]
+    return sorted([
         discord.app_commands.Choice(name=role.name, value=role.name)
-        for role in ctx.guild.roles
-        if "team" in role.name and current in role.name
-    ]
+        for role in roles
+        if current in role.name
+    ], key=lambda choice: choice.name)
