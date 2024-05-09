@@ -78,7 +78,7 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role: discord.Role):
 async def end_ctf(ctx: discord.Interaction, ctf_name: str, channel: discord.TextChannel):
     if not await util.check_is_in_bot_cmd(ctx):
         return
-    role_id, category_id = util.get_team_role(ctx.user)
+    role_id, category_id = util.get_team_info(ctx.user)
     if role_id is None:
         await ctx.response.send_message(f"チームロールがついてないよ！{ERROR_EMOJI}")
     else:
