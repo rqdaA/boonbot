@@ -12,6 +12,13 @@ def gen_password(length: int):
     return "".join(random.choices(string.ascii_lowercase, k=length))
 
 
+def get_team_role(member: discord.Member):
+    for team_role_id, category_id in zip(config.team_role_ids, config.contests_category_ids):
+        if member.get_role(team_role_id) is not None:
+            return team_role_id, category_id
+    return None, None
+
+
 async def check_is_in_contest_channel(ctx: discord.Interaction):
     if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id != config.contests_category_id:
         await ctx.response.send_message(f"ここはコンテストチャンネルじゃないよ！{ERROR_EMOJI}", ephemeral=True)
