@@ -24,7 +24,7 @@ class Categories(enum.Enum):
 async def new_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(
-            ctx, ctx.channel, channel_name
+        ctx, ctx.channel, channel_name
     ):
         return
     await ctx.response.defer(ephemeral=True)
@@ -36,7 +36,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_thread(ctx) or not await util.check_channel_exists(
-            ctx, ctx.channel.parent, channel_name
+        ctx, ctx.channel.parent, channel_name
     ):
         return
     await ctx.response.send_message(f"問題名を変更しました {CHECK_EMOJI}")
