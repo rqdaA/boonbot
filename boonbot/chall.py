@@ -64,7 +64,7 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role: discord.Role):
     if not await util.check_is_in_bot_cmd(ctx):
         return
     else:
-        category_id = util.get_category(role)
+        category_id = util.get_category_by_role(role)
         overwrites = {ctx.guild.default_role: perm.PERMISSION_DENY, role: perm.PERMISSION_WHITE}
 
         channel = await ctx.guild.create_text_channel(

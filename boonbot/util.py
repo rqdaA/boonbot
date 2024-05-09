@@ -26,7 +26,7 @@ def get_contest_channels(guild: discord.Guild):
     return channels
 
 
-def get_category(role: discord.Role):
+def get_category_by_role(role: discord.Role):
     for team_role_id, category_id in zip(config.team_role_ids, config.contests_category_ids):
         if role.id == team_role_id:
             return category_id
