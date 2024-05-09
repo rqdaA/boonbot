@@ -2,7 +2,7 @@ import discord
 
 from .config import config
 from .main import tree
-from .util import check_is_in_bot_cmd, check_is_in_contest_channel
+from .util import check_is_in_bot_cmd, check_is_in_contest_channel, get_contest_channels
 
 PERMISSION_DEFAULT = discord.PermissionOverwrite(read_messages=None, manage_channels=None)
 PERMISSION_WHITE = discord.PermissionOverwrite(read_messages=True, manage_channels=True)
@@ -91,7 +91,7 @@ async def whitelist(ctx: discord.Interaction):
 
 @join.autocomplete("channel")
 async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
-    contests = ctx.guild.get_channel(config.contests_category_id).channels
+    contests = get_contest_channels(ctx.guild)
     did_leave = lambda ch: ch.overwrites_for(ctx.user).read_messages is False
 
     return [

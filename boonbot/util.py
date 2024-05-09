@@ -19,8 +19,15 @@ def get_team_role(member: discord.Member):
     return None, None
 
 
+def get_contest_channels(guild: discord.Guild):
+    channels = []
+    for contests_category_id in config.contests_category_ids:
+        channels.extend(guild.get_channel(contests_category_id).channels)
+    return channels
+
+
 async def check_is_in_contest_channel(ctx: discord.Interaction):
-    if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id != config.contests_category_id:
+    if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id not in config.contests_category_ids:
         await ctx.response.send_message(f"ここはコンテストチャンネルじゃないよ！{ERROR_EMOJI}", ephemeral=True)
         return False
     return True
@@ -35,7 +42,7 @@ async def check_channel_exists(ctx: discord.Interaction, parent: TextChannel, ch
 
 
 async def check_is_in_thread(ctx: discord.Interaction):
-    if not isinstance(ctx.channel, Thread) or ctx.channel.category_id != config.contests_category_id:
+    if not isinstance(ctx.channel, Thread) or ctx.channel.category_id not in config.contests_category_ids:
         await ctx.response.send_message(f"ここは問題スレッドじゃないよ！{ERROR_EMOJI}", ephemeral=True)
         return False
     return True
