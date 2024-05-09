@@ -67,10 +67,9 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str):
     if role_id is None:
         await ctx.response.send_message(f"チームロールがついてないよ！{ERROR_EMOJI}")
     else:
-        overwrites = {
-            ctx.guild.default_role: perm.PERMISSION_DENY,
-            ctx.guild.get_role(role_id): perm.PERMISSION_WHITE
-        }
-        channel = await ctx.guild.create_text_channel(ctf_name, category=ctx.guild.get_channel(category_id), overwrites=overwrites)
+        overwrites = {ctx.guild.default_role: perm.PERMISSION_DENY, ctx.guild.get_role(role_id): perm.PERMISSION_WHITE}
+        channel = await ctx.guild.create_text_channel(
+            ctf_name, category=ctx.guild.get_channel(category_id), overwrites=overwrites
+        )
         await channel.send(f"`{util.gen_password(16)}`")
         await ctx.response.send_message(f"{channel.mention}を作成しました {CHECK_EMOJI}")
