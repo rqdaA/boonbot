@@ -24,7 +24,7 @@ class Categories(enum.Enum):
 async def new_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(
-        ctx, ctx.channel, channel_name
+            ctx, ctx.channel, channel_name
     ):
         return
     await ctx.response.defer(ephemeral=True)
@@ -36,7 +36,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_thread(ctx) or not await util.check_channel_exists(
-        ctx, ctx.channel.parent, channel_name
+            ctx, ctx.channel.parent, channel_name
     ):
         return
     await ctx.response.send_message(f"問題名を変更しました {CHECK_EMOJI}")
@@ -60,10 +60,11 @@ async def unsolved(ctx: discord.Interaction):
 
 
 @tree.command(name="new-ctf", description="新しいコンテストチャンネルを作成します")
-async def new_ctf(ctx: discord.Interaction, ctf_name: str, role: discord.Role):
+async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str):
     if not await util.check_is_in_bot_cmd(ctx):
         return
     else:
+        role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))[0]
         category_id = util.get_category_by_role(role)
         overwrites = {ctx.guild.default_role: perm.PERMISSION_DENY, role: perm.PERMISSION_WHITE}
 
@@ -71,34 +72,26 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role: discord.Role):
             ctf_name, category=ctx.guild.get_channel(category_id), overwrites=overwrites
         )
         await channel.send(f"`{util.gen_password(16)}`")
-        await ctx.response.send_message(f"{channel.mention}を作成しました {CHECK_EMOJI}")
+        await ctx.response.send_message(f"{role_name}に{channel.mention}を作成しました {CHECK_EMOJI}")
 
 
 @tree.command(name="end-ctf", description="複数チームで参加しているコンテストの閲覧制限を外します")
-async def end_ctf(ctx: discord.Interaction, ctf_name: str, channel: discord.TextChannel):
-    if not await util.check_is_in_bot_cmd(ctx):
+async def end_ctf(ctx: discord.Interaction):
+    if not await util.check_is_in_contest_channel(ctx):
         return
-    role_id, category_id = util.get_team_info(ctx.user)
-    if role_id is None:
-        await ctx.response.send_message(f"チームロールがついてないよ！{ERROR_EMOJI}")
-    else:
-        overwrites = {ctx.guild.default_role: perm.PERMISSION_DENY, ctx.guild.get_role(role_id): perm.PERMISSION_WHITE}
-        channel = await ctx.guild.create_text_channel(
-            ctf_name, category=ctx.guild.get_channel(category_id), overwrites=overwrites
-        )
-        await channel.send(f"`{util.gen_password(16)}`")
-        await ctx.response.send_message(f"{channel.mention}を作成しました {CHECK_EMOJI}")
+
+    for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
+        await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
+        if ch.id != ctx.channel.id:
+            await ch.send(f"ロール制限を外しました {CHECK_EMOJI}")
+    await ctx.response.send_message(f"ロール制限を外しました {CHECK_EMOJI}")
 
 
-# @end_ctf.autocomplete("channel")
-# async def autocomplete(ctx: discord.Interaction, current: discord.TextChannel) -> list[
-#     discord.app_commands.Choice[discord.TextChannel]]:
-#     team_id = [team for team in ctx.user.roles if team.id in config.team_role_ids]
-#     if team_id != 1:
-#
-#     else:
-#         return [
-#             discord.app_commands.Choice(name=ch.name, value=ch.name)
-#             for ch in ctx.guild.channels
-#             if ch.changed_roles
-#         ]
+@new_ctf.autocomplete("role_name")
+async def autocomplete(ctx: discord.Interaction, current: str) -> list[
+    discord.app_commands.Choice[discord.TextChannel]]:
+    return [
+        discord.app_commands.Choice(name=role.name, value=role.name)
+        for role in ctx.guild.roles
+        if "team" in role.name and current in role.name
+    ]
