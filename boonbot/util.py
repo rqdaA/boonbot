@@ -26,6 +26,13 @@ def get_contest_channels(guild: discord.Guild):
     return channels
 
 
+def get_team_name_by_role(role: discord.Role):
+    for team_role_id, team_name in zip(config.team_role_ids, config.team_names):
+        if role.id == team_role_id:
+            return team_name
+    return None
+
+
 def get_category_by_role(role: discord.Role):
     for team_role_id, category_id in zip(config.team_role_ids, config.contests_category_ids):
         if role.id == team_role_id:

@@ -65,13 +65,14 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str):
         return
     else:
         role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))[0]
+        team_name = util.get_team_name_by_role(role)
         category_id = util.get_category_by_role(role)
         overwrites = {ctx.guild.default_role: perm.PERMISSION_DENY, role: perm.PERMISSION_WHITE}
 
         channel = await ctx.guild.create_text_channel(
             f"{RUNNING_EMOJI}{ctf_name}", category=ctx.guild.get_channel(category_id), overwrites=overwrites
         )
-        await channel.send(f"`{util.gen_password(16)}`")
+        await channel.send(f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`")
         await ctx.response.send_message(f"{role_name}に{channel.mention}を作成しました {CHECK_EMOJI}")
 
 

@@ -50,6 +50,7 @@ def main():
     parser.add_argument("--token", type=str, required=True)
     parser.add_argument("--guild-id", type=int, required=True)
     parser.add_argument("--bot-channel-id", type=int, required=True)
+    parser.add_argument("--team-names", nargs="+", type=str, required=True)
     parser.add_argument("--contests-category-ids", nargs="+", type=int, required=True)
     parser.add_argument("--team-role-ids", nargs="+", type=int, required=True)
     res = parser.parse_args()
@@ -57,6 +58,7 @@ def main():
     logging.basicConfig(level=logging.INFO, force=True)
     config.guild_id = res.guild_id
     config.bot_channel_id = res.bot_channel_id
+    config.team_names = res.team_names
     config.contests_category_ids = res.contests_category_ids
     config.team_role_ids = res.team_role_ids
 
