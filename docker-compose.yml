@@ -8,3 +8,4 @@ services:
       - GUILD_ID=${GUILD_ID}
       - BOT_CHANNEL_ID=${BOT_CHANNEL_ID}
       - CONTESTS_ID=${CONTESTS_ID}
+      - TEAM_ID=${TEAM_ID}
