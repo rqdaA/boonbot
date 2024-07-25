@@ -49,7 +49,7 @@ async def check_is_in_contest_channel(ctx: discord.Interaction):
 
 async def check_channel_exists(ctx: discord.Interaction, parent: TextChannel, channel_name: str):
     for channel in parent.threads:
-        if channel.name.removeprefix(SOLVED_PREFIX) == channel_name:
+        if channel.name.removeprefix(SOLVED_PREFIX).lower() == channel_name.lower():
             await ctx.response.send_message(f"すでに存在するよ！{ERROR_EMOJI}", ephemeral=True)
             return False
     return True
