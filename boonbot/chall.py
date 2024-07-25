@@ -40,7 +40,8 @@ async def rename_chall(ctx: discord.Interaction, category: Categories, problem_n
     ):
         return
     await ctx.response.send_message(f"問題名を変更しました {CHECK_EMOJI}")
-    await ctx.channel.edit(name=channel_name)
+    await ctx.channel.edit(
+        name=f'{SOLVED_PREFIX}{channel_name}' if ctx.channel.name.startswith(SOLVED_PREFIX) else channel_name)
 
 
 @tree.command(name="solved", description="スレッドをsolved状態にします")
@@ -48,7 +49,7 @@ async def solved(ctx: discord.Interaction):
     if not await util.check_is_in_thread(ctx) or not await util.check_is_unsolved(ctx):
         return
     await ctx.response.send_message("<:tensai:1096701452078022707>")
-    await ctx.channel.edit(name=SOLVED_PREFIX + ctx.channel.name)
+    await ctx.channel.edit(name=f'{SOLVED_PREFIX}{ctx.channel.name}')
 
 
 @tree.command(name="unsolved", description="スレッドをunsolved状態にします")
