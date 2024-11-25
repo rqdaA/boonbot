@@ -7,5 +7,6 @@ services:
       - TOKEN=${TOKEN}
       - GUILD_ID=${GUILD_ID}
       - BOT_CHANNEL_ID=${BOT_CHANNEL_ID}
-      - CONTESTS_ID=${CONTESTS_ID}
-      - TEAM_ID=${TEAM_ID}
+      - CONTESTS_IDS=${CONTESTS_IDS}
+      - TEAM_IDS=${TEAM_IDS}
+      - TEAM_NAMES=${TEAM_NAMES}
