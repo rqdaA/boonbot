@@ -23,21 +23,17 @@ class Categories(enum.Enum):
 @tree.command(name="new-chall", description="問題スレッドを作成します")
 async def new_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
-    if not await util.check_is_in_contest_channel(
-        ctx
-    ) or not await util.check_channel_exists(ctx, ctx.channel, channel_name):
+    if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(
+        ctx, ctx.channel, channel_name
+    ):
         return
     await ctx.response.defer(ephemeral=True)
-    await ctx.channel.create_thread(
-        name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080
-    )
+    await ctx.channel.create_thread(name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080)
     await ctx.delete_original_response()
 
 
 @tree.command(name="rename-chall", description="問題名を変更します")
-async def rename_chall(
-    ctx: discord.Interaction, category: Categories, problem_name: str
-):
+async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_thread(ctx) or not await util.check_channel_exists(
         ctx, ctx.channel.parent, channel_name
@@ -45,11 +41,7 @@ async def rename_chall(
         return
     await ctx.response.send_message(f"問題名を変更しました {CHECK_EMOJI}")
     await ctx.channel.edit(
-        name=(
-            f"{SOLVED_PREFIX}{channel_name}"
-            if ctx.channel.name.startswith(SOLVED_PREFIX)
-            else channel_name
-        )
+        name=(f"{SOLVED_PREFIX}{channel_name}" if ctx.channel.name.startswith(SOLVED_PREFIX) else channel_name)
     )
 
 
@@ -88,12 +80,8 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str):
             overwrites=overwrites,
             position=0,
         )
-        await channel.send(
-            f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`"
-        )
-        await ctx.response.send_message(
-            f"{role_name}に{channel.mention}を作成しました {CHECK_EMOJI}"
-        )
+        await channel.send(f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`")
+        await ctx.response.send_message(f"{role_name}に{channel.mention}を作成しました {CHECK_EMOJI}")
 
 
 @tree.command(name="unend-ctf", description="コンテストの閲覧制限を再度付けます")
@@ -119,9 +107,7 @@ async def end_ctf(ctx: discord.Interaction):
     for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
         if not ch.name.startswith(RUNNING_EMOJI):
             continue
-        await ch.set_permissions(
-            ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT
-        )
+        await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
         await ch.edit(name=ch.name.lstrip(RUNNING_EMOJI))
         if ch.id != ctx.channel.id:
             await ch.send(f"ロール制限を外しました {CHECK_EMOJI}")
@@ -129,15 +115,9 @@ async def end_ctf(ctx: discord.Interaction):
 
 
 @new_ctf.autocomplete("role_name")
-async def autocomplete(
-    ctx: discord.Interaction, current: str
-) -> list[discord.app_commands.Choice[str]]:
+async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
     roles = [ctx.guild.get_role(role_id) for role_id in config.team_role_ids]
     return sorted(
-        [
-            discord.app_commands.Choice(name=role.name, value=role.name)
-            for role in roles
-            if current in role.name
-        ],
+        [discord.app_commands.Choice(name=role.name, value=role.name) for role in roles if current in role.name],
         key=lambda choice: choice.name,
     )
