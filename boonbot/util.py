@@ -88,3 +88,9 @@ async def check_is_in_bot_cmd(ctx: discord.Interaction):
 
 async def ratelimit_error(ctx: discord.Interaction):
     await ctx.response.send_message(f"レート制限だよ！{ERROR_EMOJI}", ephemeral=True)
+
+
+async def get_tensai_emoji(ctx: discord.Interaction):
+    for emoji in await ctx.guild.fetch_emojis():
+        if emoji.name == "tensai":
+            return emoji
