@@ -62,4 +62,6 @@ def main():
     config.contests_category_ids = res.contests_category_ids
     config.team_role_ids = res.team_role_ids
 
+    assert len(config.team_names) == len(config.contests_category_ids) == len(config.team_role_ids), "team_names / contests_category_ids / team_role_ids の設定が正しくないよ！"
+
     client.run(res.token)
