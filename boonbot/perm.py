@@ -54,7 +54,7 @@ async def whitelist(
 
     non_bot_member = [member for member in ctx.guild.members if not member.bot]
     current_members = list(filter(lambda u: ctx.channel.overwrites_for(u).read_messages, non_bot_member))
-    admins = [member for member in ctx.guild.members if not member.guild_permissions.administrator]
+    admins = [member for member in ctx.guild.members if member.guild_permissions.administrator]
     target_members = list(filter(lambda u: u is not None, [ctx.user, u1, u2, u3, u4, u5, *admins]))
 
     if all([ctx.channel.overwrites_for(member).read_messages is None for member in non_bot_member]):
