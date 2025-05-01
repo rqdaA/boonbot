@@ -1,5 +1,7 @@
 import discord
+from discord import Role
 
+from . import util
 from .config import config
 from .main import tree
 from .util import check_is_in_bot_cmd, check_is_in_contest_channel, get_contest_channels
@@ -52,27 +54,28 @@ async def whitelist(
     if not await check_is_in_contest_channel(ctx):
         return
 
-    non_bot_member = [member for member in ctx.guild.members if not member.bot]
-    current_members = list(filter(lambda u: ctx.channel.overwrites_for(u).read_messages, non_bot_member))
-    admins = [member for member in ctx.guild.members if member.guild_permissions.administrator]
-    target_members = list(filter(lambda u: u is not None, [ctx.user, u1, u2, u3, u4, u5, *admins]))
-
-    if all([ctx.channel.overwrites_for(member).read_messages is None for member in non_bot_member]):
+    team_role = ctx.guild.get_role(util.get_role_by_category(ctx.channel.category))
+    non_bot_member = list(filter(lambda u: not u.bot, ctx.guild.members))
+    whitelisted_members = list(filter(lambda u: ctx.channel.overwrites_for(u).read_messages, non_bot_member))
+    admins = list(filter(lambda u: u.guild_permissions.administrator, ctx.guild.members))
+    target_members = [ctx.user, u1, u2, u3, u4, u5]
+    added = []
+    for member in target_members + admins:
+        if member is None or member in whitelisted_members + added:
+            continue
+        added.append(member)
+        await ctx.channel.set_permissions(member, overwrite=PERMISSION_WHITE)
+    if len(whitelisted_members) == 0:
         # Channel is Not Whitelisted
-        mentions = " ".join({user.mention for user in target_members})
+        await ctx.channel.set_permissions(team_role, overwrite=PERMISSION_DENY)
+        mentions = " ".join(member.mention for member in whitelisted_members + added if member in target_members)
         await ctx.response.send_message(f"ホワイトリストに変更しました\nメンバー:{mentions}")
-        await ctx.channel.set_permissions(ctx.guild.default_role, overwrite=PERMISSION_DENY)
-        for member in target_members:
-            await ctx.channel.set_permissions(member, overwrite=PERMISSION_WHITE)
     else:
         # Channel is Already Whitelisted
-        if all([member in current_members for member in target_members]):
+        if len(added) == 0:
             await ctx.response.send_message("そのメンバーはすでにホワイトリストに入っています", ephemeral=True)
             return
-
-        for member in target_members:
-            await ctx.channel.set_permissions(member, overwrite=PERMISSION_WHITE)
-        mentions = " ".join({member.mention for member in target_members if member not in current_members})
+        mentions = " ".join(member.mention for member in added if member in target_members)
         await ctx.response.send_message(f"{mentions}をホワイトリストに追加しました")
 
 
@@ -81,11 +84,12 @@ async def whitelist(ctx: discord.Interaction):
     if not await check_is_in_contest_channel(ctx):
         return
 
-    await ctx.channel.set_permissions(ctx.guild.default_role, overwrite=PERMISSION_DEFAULT)
-    non_bot_member = [member for member in ctx.guild.members if not member.bot]
-    current_members = list(filter(lambda u: ctx.channel.overwrites_for(u).read_messages, non_bot_member))
-    for member in current_members:
+    team_role = ctx.guild.get_role(util.get_role_by_category(ctx.channel.category))
+    non_bot_member = list(filter(lambda u: not u.bot, ctx.guild.members))
+    whitelisted_members = list(filter(lambda u: ctx.channel.overwrites_for(u).read_messages, non_bot_member))
+    for member in whitelisted_members:
         await ctx.channel.set_permissions(member, overwrite=PERMISSION_DEFAULT)
+    await ctx.channel.set_permissions(team_role, overwrite=PERMISSION_WHITE)
     await ctx.response.send_message("ホワイトリストを解除しました")
 
 

@@ -2,7 +2,7 @@ import random
 import string
 
 import discord
-from discord import TextChannel, Thread
+from discord import TextChannel, Thread, CategoryChannel
 
 from .config import config
 from .main import ERROR_EMOJI, SOLVED_PREFIX
@@ -37,6 +37,13 @@ def get_category_by_role(role: discord.Role):
     for team_role_id, category_id in zip(config.team_role_ids, config.contests_category_ids):
         if role.id == team_role_id:
             return category_id
+    return None
+
+
+def get_role_by_category(category: CategoryChannel):
+    for team_role_id, category_id in zip(config.team_role_ids, config.contests_category_ids):
+        if category.id == category_id:
+            return team_role_id
     return None
 
 
