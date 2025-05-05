@@ -93,6 +93,8 @@ async def unend_ctf(ctx: discord.Interaction):
     for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
         if ch.name.startswith(RUNNING_EMOJI):
             continue
+        team_role = ctx.guild.get_role(util.get_role_by_category(ch.category))
+        await ch.set_permissions(team_role, overwrite=perm.PERMISSION_WHITE)
         await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DENY)
         await ch.edit(name=f"{RUNNING_EMOJI}{ch.name}")
         if ch.id != ctx.channel.id:
@@ -108,8 +110,14 @@ async def end_ctf(ctx: discord.Interaction):
     for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
         if not ch.name.startswith(RUNNING_EMOJI):
             continue
-        await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
+        team_role = ctx.guild.get_role(util.get_role_by_category(ch.category))
+        non_bot_member = list(filter(lambda u: not u.bot, ctx.guild.members))
+        whitelisted_members = list(filter(lambda u: ch.overwrites_for(u).read_messages, non_bot_member))
         await ch.edit(name=ch.name.lstrip(RUNNING_EMOJI))
+        for member in whitelisted_members:
+            await ch.set_permissions(member, overwrite=perm.PERMISSION_DEFAULT)
+        await ch.set_permissions(team_role, overwrite=perm.PERMISSION_DEFAULT)
+        await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
         if ch.id != ctx.channel.id:
             await ch.send(f"ロール制限を外しました {CHECK_EMOJI}")
     await ctx.response.send_message(f"ロール制限を外しました {CHECK_EMOJI}")

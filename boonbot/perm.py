@@ -80,7 +80,7 @@ async def whitelist(
 
 
 @tree.command(name="unwhitelist", description="ホワイトリストを解除します")
-async def whitelist(ctx: discord.Interaction):
+async def unwhitelist(ctx: discord.Interaction):
     if not await check_is_in_contest_channel(ctx):
         return
 
