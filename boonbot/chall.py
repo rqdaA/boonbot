@@ -57,7 +57,9 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
     ):
         return
     await ctx.response.defer(ephemeral=True)
-    thread = await ctx.channel.create_thread(name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080)
+    thread = await ctx.channel.create_thread(
+        name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080
+    )
     await thread.send(view=JoinButton(thread))
     adding_users = set(ctx.guild.get_member(user_id) for user_id in auto_join_users.get(ctx.channel.id) or [])
     for user in adding_users | {ctx.user}:
