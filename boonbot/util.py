@@ -47,6 +47,10 @@ def get_role_by_category(category: CategoryChannel):
     return None
 
 
+def is_bot_cmd_channel(channel: discord.TextChannel):
+    return channel.id == config.bot_channel_id
+
+
 async def check_is_in_contest_channel(ctx: discord.Interaction):
     if not isinstance(ctx.channel, TextChannel) or ctx.channel.category_id not in config.contests_category_ids:
         await ctx.response.send_message(f"ここはコンテストチャンネルじゃないよ！{ERROR_EMOJI}", ephemeral=True)
@@ -84,7 +88,7 @@ async def check_is_solved(ctx: discord.Interaction):
 
 
 async def check_is_in_bot_cmd(ctx: discord.Interaction):
-    if ctx.channel.id != config.bot_channel_id:
+    if not is_bot_cmd_channel(ctx.channel):
         await ctx.response.send_message(
             f"{ctx.guild.get_channel(config.bot_channel_id).mention} で実行してね！{ERROR_EMOJI}",
             ephemeral=True,

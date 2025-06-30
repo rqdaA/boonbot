@@ -7,8 +7,7 @@ from discord.ui import Button, View
 
 from . import util, perm
 from .config import config
-from .main import tree, CHECK_EMOJI, SOLVED_PREFIX, RUNNING_EMOJI
-
+from .main import tree, client, CHECK_EMOJI, SOLVED_PREFIX, RUNNING_EMOJI, JOIN_EMOJI
 
 auto_join_users: Dict[int, Set[int]] = {}
 
@@ -34,7 +33,8 @@ class AutoJoinButton(View):
         if channel_id not in auto_join_users:
             auto_join_users[channel_id] = set()
         auto_join_users[channel_id].add(interaction.user.id)
-        await interaction.response.send_message(f"問題スレッドに自動で参加するように設定しました {CHECK_EMOJI}", ephemeral=True)
+        await interaction.response.send_message(f"問題スレッドに自動で参加するように設定しました {CHECK_EMOJI}",
+                                                ephemeral=True)
 
 
 class Categories(enum.Enum):
@@ -53,7 +53,7 @@ class Categories(enum.Enum):
 async def new_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(
-        ctx, ctx.channel, channel_name
+            ctx, ctx.channel, channel_name
     ):
         return
     await ctx.response.defer(ephemeral=True)
@@ -71,7 +71,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_thread(ctx) or not await util.check_channel_exists(
-        ctx, ctx.channel.parent, channel_name
+            ctx, ctx.channel.parent, channel_name
     ):
         return
     await ctx.response.send_message(f"問題名を変更しました {CHECK_EMOJI}")
@@ -98,17 +98,22 @@ async def unsolved(ctx: discord.Interaction):
 
 
 @tree.command(name="new-ctf", description="新しいコンテストチャンネルを作成します")
-async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str):
+async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, add_everyone: bool):
     if not await util.check_is_in_bot_cmd(ctx):
         return
     else:
         role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))[0]
         team_name = util.get_team_name_by_role(role)
         category_id = util.get_category_by_role(role)
-        overwrites = {
-            ctx.guild.default_role: perm.PERMISSION_DENY,
-            role: perm.PERMISSION_WHITE,
-        }
+        if add_everyone:
+            overwrites = {
+                ctx.guild.default_role: perm.PERMISSION_DENY,
+                role: perm.PERMISSION_WHITE,
+            }
+        else:
+            overwrites = {
+                ctx.guild.default_role: perm.PERMISSION_DENY,
+            }
 
         channel = await ctx.guild.create_text_channel(
             f"{RUNNING_EMOJI}{ctf_name}",
@@ -117,9 +122,16 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str):
             position=0,
         )
         await channel.send(f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`", view=AutoJoinButton())
-        await ctx.response.send_message(f"{role_name}に{channel.mention}を作成しました {CHECK_EMOJI}")
+        resp_text = f"{role_name}に{ctf_name} ({channel.mention}) を作成しました {CHECK_EMOJI}"
+        if add_everyone:
+            await ctx.response.send_message(resp_text)
+        else:
+            await ctx.response.defer()
+            msg = await ctx.followup.send(f'{resp_text}\n参加するには{JOIN_EMOJI}を押してください')
+            await msg.add_reaction(JOIN_EMOJI)
 
 
+# TODO: add_everyone==FalseなCTFでunendをした時に閲覧制限の再設定がうまく行かない問題を解決
 @tree.command(name="unend-ctf", description="コンテストの閲覧制限を再度付けます")
 async def unend_ctf(ctx: discord.Interaction):
     if not await util.check_is_in_contest_channel(ctx):
@@ -160,6 +172,32 @@ async def end_ctf(ctx: discord.Interaction):
 
 @new_ctf.autocomplete("role_name")
 async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
-    return sorted(
-        app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower()
-    )
+    return [app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower()]
+
+
+@client.event
+async def on_reaction_add(reaction: discord.Reaction, user: discord.Member | discord.User):
+    emoji = reaction.emoji
+    if emoji != JOIN_EMOJI:
+        return
+    message = reaction.message
+    if not util.is_bot_cmd_channel(message.channel):
+        return
+    contest_channel = message.channel_mentions
+    if len(contest_channel) == 1:
+        ch = contest_channel[0]
+        await ch.set_permissions(user, overwrite=perm.PERMISSION_WHITE)
+
+
+@client.event
+async def on_reaction_remove(reaction: discord.Reaction, user: discord.Member | discord.User):
+    emoji = reaction.emoji
+    if emoji != JOIN_EMOJI:
+        return
+    message = reaction.message
+    if not util.is_bot_cmd_channel(message.channel):
+        return
+    contest_channel = message.channel_mentions
+    if len(contest_channel) == 1:
+        ch = contest_channel[0]
+        await ch.set_permissions(user, overwrite=perm.PERMISSION_DEFAULT)

@@ -20,6 +20,7 @@ SOLVED_PREFIX = "🚩 "
 CHECK_EMOJI = "✅"
 ERROR_EMOJI = "😡"
 RUNNING_EMOJI = "🆙"
+JOIN_EMOJI = "💪"
 
 
 @tree.command(name="help", description="Botで使えるコマンドを一覧で表示します")
@@ -65,7 +66,7 @@ def main():
     logger.info(f"Loading team configuration from file: {'Success' if loaded_from_file else 'Failed'}")
 
     assert (
-        len(config.team_names) == len(config.contests_category_ids) == len(config.team_role_ids)
+            len(config.team_names) == len(config.contests_category_ids) == len(config.team_role_ids)
     ), "team_names / contests_category_ids / team_role_ids の設定が正しくないよ！"
 
     client.run(res.token)
