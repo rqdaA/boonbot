@@ -35,6 +35,9 @@ async def commands_help(ctx: discord.Interaction):
 - leave
 - solved
 - unsolved
+- team list
+- whitelist
+- unwhitelist
 """,
         ephemeral=True,
     )
@@ -50,17 +53,16 @@ def main():
     parser.add_argument("--token", type=str, required=True)
     parser.add_argument("--guild-id", type=int, required=True)
     parser.add_argument("--bot-channel-id", type=int, required=True)
-    parser.add_argument("--team-names", nargs="+", type=str, required=True)
-    parser.add_argument("--contests-category-ids", nargs="+", type=int, required=True)
-    parser.add_argument("--team-role-ids", nargs="+", type=int, required=True)
+    parser.add_argument("--admin-role-id", type=int, required=True)
     res = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, force=True)
     config.guild_id = res.guild_id
     config.bot_channel_id = res.bot_channel_id
-    config.team_names = res.team_names
-    config.contests_category_ids = res.contests_category_ids
-    config.team_role_ids = res.team_role_ids
+    config.admin_role_id = res.admin_role_id
+
+    loaded_from_file = config.load_from_file()
+    logger.info(f"Loading team configuration from file: {'Success' if loaded_from_file else 'Failed'}")
 
     assert (
         len(config.team_names) == len(config.contests_category_ids) == len(config.team_role_ids)

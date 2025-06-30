@@ -1,11 +1,11 @@
 import enum
 
 import discord
-from discord import ChannelType
+from discord import ChannelType, app_commands
 
 from . import util, perm
 from .config import config
-from .main import tree, CHECK_EMOJI, SOLVED_PREFIX, ERROR_EMOJI, RUNNING_EMOJI
+from .main import tree, CHECK_EMOJI, SOLVED_PREFIX, RUNNING_EMOJI
 
 
 class Categories(enum.Enum):
@@ -125,8 +125,4 @@ async def end_ctf(ctx: discord.Interaction):
 
 @new_ctf.autocomplete("role_name")
 async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
-    roles = [ctx.guild.get_role(role_id) for role_id in config.team_role_ids]
-    return sorted(
-        [discord.app_commands.Choice(name=role.name, value=role.name) for role in roles if current in role.name],
-        key=lambda choice: choice.name,
-    )
+    return sorted(app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower())

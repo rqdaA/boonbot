@@ -2,7 +2,7 @@ import random
 import string
 
 import discord
-from discord import TextChannel, Thread, CategoryChannel
+from discord import TextChannel, Thread, CategoryChannel, app_commands
 
 from .config import config
 from .main import ERROR_EMOJI, SOLVED_PREFIX
@@ -101,3 +101,9 @@ async def get_tensai_emoji(ctx: discord.Interaction):
     for emoji in await ctx.guild.fetch_emojis():
         if emoji.name == "tensai":
             return emoji
+
+
+def has_admin_role():
+    async def predicate(interaction: discord.Interaction) -> bool:
+        return interaction.user.get_role(config.admin_role_id) is not None
+    return app_commands.check(predicate)
