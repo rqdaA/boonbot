@@ -98,21 +98,21 @@ async def unsolved(ctx: discord.Interaction):
 
 
 @tree.command(name="new-ctf", description="新しいコンテストチャンネルを作成します")
-async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, add_everyone: bool):
+async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, need_reaction: bool = False):
     if not await util.check_is_in_bot_cmd(ctx):
         return
     else:
         role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))[0]
         team_name = util.get_team_name_by_role(role)
         category_id = util.get_category_by_role(role)
-        if add_everyone:
+        if need_reaction:
             overwrites = {
                 ctx.guild.default_role: perm.PERMISSION_DENY,
-                role: perm.PERMISSION_WHITE,
             }
         else:
             overwrites = {
                 ctx.guild.default_role: perm.PERMISSION_DENY,
+                role: perm.PERMISSION_WHITE,
             }
 
         channel = await ctx.guild.create_text_channel(
@@ -123,12 +123,12 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, add_e
         )
         await channel.send(f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`", view=AutoJoinButton())
         resp_text = f"{role_name}に{ctf_name} ({channel.mention}) を作成しました {CHECK_EMOJI}"
-        if add_everyone:
-            await ctx.response.send_message(resp_text)
-        else:
+        if need_reaction:
             await ctx.response.defer()
             msg = await ctx.followup.send(f'{resp_text}\n参加するには{JOIN_EMOJI}を押してください')
             await msg.add_reaction(JOIN_EMOJI)
+        else:
+            await ctx.response.send_message(resp_text)
 
 
 # TODO: add_everyone==FalseなCTFでunendをした時に閲覧制限の再設定がうまく行かない問題を解決
@@ -183,6 +183,8 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.Member | dis
     message = reaction.message
     if not util.is_bot_cmd_channel(message.channel):
         return
+    if not any(message.content.startswith(role.name) for role in user.roles):
+        return
     contest_channel = message.channel_mentions
     if len(contest_channel) == 1:
         ch = contest_channel[0]
@@ -196,6 +198,8 @@ async def on_reaction_remove(reaction: discord.Reaction, user: discord.Member | 
         return
     message = reaction.message
     if not util.is_bot_cmd_channel(message.channel):
+        return
+    if not any(message.content.startswith(role.name) for role in user.roles):
         return
     contest_channel = message.channel_mentions
     if len(contest_channel) == 1:
