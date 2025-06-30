@@ -1,11 +1,40 @@
 import enum
+from typing import Dict, List, Set
 
 import discord
 from discord import ChannelType, app_commands
+from discord.ui import Button, View
 
 from . import util, perm
 from .config import config
 from .main import tree, CHECK_EMOJI, SOLVED_PREFIX, RUNNING_EMOJI
+
+
+auto_join_users: Dict[int, Set[int]] = {}
+
+
+class JoinButton(View):
+    def __init__(self, thread):
+        super().__init__(timeout=None)
+        self.thread = thread
+
+    @discord.ui.button(label="Join", style=discord.ButtonStyle.primary)
+    async def join_button(self, interaction: discord.Interaction, button: Button):
+        await self.thread.add_user(interaction.user)
+        await interaction.response.send_message(f"スレッドに参加しました {CHECK_EMOJI}", ephemeral=True)
+
+
+class AutoJoinButton(View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="問題スレッドに自動で参加", style=discord.ButtonStyle.success)
+    async def auto_join_button(self, interaction: discord.Interaction, button: Button):
+        channel_id = interaction.channel.id
+        if channel_id not in auto_join_users:
+            auto_join_users[channel_id] = set()
+        auto_join_users[channel_id].add(interaction.user.id)
+        await interaction.response.send_message(f"問題スレッドに自動で参加するように設定しました {CHECK_EMOJI}", ephemeral=True)
 
 
 class Categories(enum.Enum):
@@ -28,7 +57,11 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
     ):
         return
     await ctx.response.defer(ephemeral=True)
-    await ctx.channel.create_thread(name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080)
+    thread = await ctx.channel.create_thread(name=channel_name, type=ChannelType.public_thread, auto_archive_duration=10080)
+    await thread.send(view=JoinButton(thread))
+    adding_users = set(ctx.guild.get_member(user_id) for user_id in auto_join_users.get(ctx.channel.id) or [])
+    for user in adding_users | {ctx.user}:
+        await thread.add_user(user)
     await ctx.delete_original_response()
 
 
@@ -81,7 +114,7 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str):
             overwrites=overwrites,
             position=0,
         )
-        await channel.send(f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`")
+        await channel.send(f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`", view=AutoJoinButton())
         await ctx.response.send_message(f"{role_name}に{channel.mention}を作成しました {CHECK_EMOJI}")
 
 
