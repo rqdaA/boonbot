@@ -33,8 +33,7 @@ class AutoJoinButton(View):
         if channel_id not in auto_join_users:
             auto_join_users[channel_id] = set()
         auto_join_users[channel_id].add(interaction.user.id)
-        await interaction.response.send_message(f"問題スレッドに自動で参加するように設定しました {CHECK_EMOJI}",
-                                                ephemeral=True)
+        await interaction.response.send_message(f"問題スレッドに自動で参加するように設定しました {CHECK_EMOJI}", ephemeral=True)
 
 
 class Categories(enum.Enum):
@@ -53,7 +52,7 @@ class Categories(enum.Enum):
 async def new_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_contest_channel(ctx) or not await util.check_channel_exists(
-            ctx, ctx.channel, channel_name
+        ctx, ctx.channel, channel_name
     ):
         return
     await ctx.response.defer(ephemeral=True)
@@ -71,7 +70,7 @@ async def new_chall(ctx: discord.Interaction, category: Categories, problem_name
 async def rename_chall(ctx: discord.Interaction, category: Categories, problem_name: str):
     channel_name = f"{category.value}: {problem_name}"
     if not await util.check_is_in_thread(ctx) or not await util.check_channel_exists(
-            ctx, ctx.channel.parent, channel_name
+        ctx, ctx.channel.parent, channel_name
     ):
         return
     await ctx.response.send_message(f"問題名を変更しました {CHECK_EMOJI}")
@@ -125,7 +124,7 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, need_
         resp_text = f"{role_name}に{ctf_name} ({channel.mention}) を作成しました {CHECK_EMOJI}"
         if need_reaction:
             await ctx.response.defer()
-            msg = await ctx.followup.send(f'{resp_text}\n参加するには{JOIN_EMOJI}を押してください')
+            msg = await ctx.followup.send(f"{resp_text}\n参加するには{JOIN_EMOJI}を押してください")
             await msg.add_reaction(JOIN_EMOJI)
         else:
             await ctx.response.send_message(resp_text)

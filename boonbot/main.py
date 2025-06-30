@@ -65,11 +65,11 @@ def main():
     loaded_from_file = config.load_from_file()
     logger.info(f"Loading team configuration from file: {'Success' if loaded_from_file else 'Failed'}")
     if not loaded_from_file:
-        print(f'{CONFIG_FILE} not found')
+        print(f"{CONFIG_FILE} not found")
         exit(1)
 
     assert (
-            len(config.team_names) == len(config.contests_category_ids) == len(config.team_role_ids)
+        len(config.team_names) == len(config.contests_category_ids) == len(config.team_role_ids)
     ), "team_names / contests_category_ids / team_role_ids の設定が正しくないよ！"
 
     client.run(res.token)
