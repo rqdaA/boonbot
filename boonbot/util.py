@@ -106,4 +106,5 @@ async def get_tensai_emoji(ctx: discord.Interaction):
 def has_admin_role():
     async def predicate(interaction: discord.Interaction) -> bool:
         return interaction.user.get_role(config.admin_role_id) is not None
+
     return app_commands.check(predicate)

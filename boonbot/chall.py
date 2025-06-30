@@ -125,4 +125,6 @@ async def end_ctf(ctx: discord.Interaction):
 
 @new_ctf.autocomplete("role_name")
 async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
-    return sorted(app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower())
+    return sorted(
+        app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower()
+    )

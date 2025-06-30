@@ -3,6 +3,7 @@ import os
 
 CONFIG_FILE = "./config.json"
 
+
 class Config:
     guild_id: int = -1
     bot_channel_id: int = -1
@@ -15,7 +16,7 @@ class Config:
         config_data = {
             "team_names": self.team_names,
             "contests_category_ids": self.contests_category_ids,
-            "team_role_ids": self.team_role_ids
+            "team_role_ids": self.team_role_ids,
         }
         with open(CONFIG_FILE, "w") as f:
             json.dump(config_data, f, indent=4)

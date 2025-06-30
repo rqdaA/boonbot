@@ -8,6 +8,7 @@ from .util import has_admin_role
 
 team = app_commands.Group(name="team", description="チーム管理コマンド")
 
+
 @team.command(name="list", description="すべてのチームを表示します")
 async def list_teams(ctx: discord.Interaction):
     if not await util.check_is_in_bot_cmd(ctx):
@@ -18,7 +19,9 @@ async def list_teams(ctx: discord.Interaction):
         return
 
     team_info = []
-    for i, (team_name, category_id, role_id) in enumerate(zip(config.team_names, config.contests_category_ids, config.team_role_ids)):
+    for i, (team_name, category_id, role_id) in enumerate(
+        zip(config.team_names, config.contests_category_ids, config.team_role_ids)
+    ):
         category = ctx.guild.get_channel(category_id)
         role = ctx.guild.get_role(role_id)
         category_name = category.name if category else "不明なカテゴリ"
@@ -27,9 +30,12 @@ async def list_teams(ctx: discord.Interaction):
 
     await ctx.response.send_message("## チーム一覧\n" + "\n".join(team_info), ephemeral=True)
 
+
 @team.command(name="add", description="新しいチームを追加します")
 @has_admin_role()
-async def add_team(ctx: discord.Interaction, team_name: str, contests_category: discord.CategoryChannel, team_role: discord.Role):
+async def add_team(
+    ctx: discord.Interaction, team_name: str, contests_category: discord.CategoryChannel, team_role: discord.Role
+):
     if not await util.check_is_in_bot_cmd(ctx):
         return
 
@@ -44,10 +50,10 @@ async def add_team(ctx: discord.Interaction, team_name: str, contests_category: 
     config.save_to_file()
 
     await ctx.response.send_message(
-        f"チーム '{team_name}' を追加しました {CHECK_EMOJI}\n"
-        f"カテゴリ: {contests_category.name}, ロール: {team_role.name}",
-        ephemeral=True
+        f"チーム '{team_name}' を追加しました {CHECK_EMOJI}\n" f"カテゴリ: {contests_category.name}, ロール: {team_role.name}",
+        ephemeral=True,
     )
+
 
 @team.command(name="remove", description="チームを削除します")
 @has_admin_role()
@@ -75,13 +81,15 @@ async def remove_team(ctx: discord.Interaction, team_name: str):
     config.save_to_file()
 
     await ctx.response.send_message(
-        f"チーム '{team_name}' を削除しました {CHECK_EMOJI}\n"
-        f"カテゴリ: {category_name}, ロール: {role_name}",
-        ephemeral=True
+        f"チーム '{team_name}' を削除しました {CHECK_EMOJI}\n" f"カテゴリ: {category_name}, ロール: {role_name}", ephemeral=True
     )
+
 
 @remove_team.autocomplete("team_name")
 async def team_name_autocomplete(ctx: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-    return sorted(app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower())
+    return sorted(
+        app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower()
+    )
+
 
 tree.add_command(team)
