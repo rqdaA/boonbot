@@ -1,10 +1,10 @@
-FROM ubuntu:22.04
-RUN apt update && apt upgrade -y && apt install -y git python3.10 python-is-python3 python3-pip
-WORKDIR /opt/boonbot
+FROM python:3.10-slim
 COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./boonbot/ /opt/boonbot/boonbot/
+WORKDIR /opt/boonbot
+
+COPY ./boonbot/ ./boonbot/
 COPY ./run.py .
 COPY ./start.sh .
-CMD bash start.sh
+CMD ["bash", "start.sh"]

@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import discord
 from discord import app_commands
 
-from .config import config
+from .config import config, CONFIG_FILE
 
 intents = discord.Intents.default()
 intents.members = True
@@ -64,6 +64,9 @@ def main():
 
     loaded_from_file = config.load_from_file()
     logger.info(f"Loading team configuration from file: {'Success' if loaded_from_file else 'Failed'}")
+    if not loaded_from_file:
+        print(f'{CONFIG_FILE} not found')
+        exit(1)
 
     assert (
             len(config.team_names) == len(config.contests_category_ids) == len(config.team_role_ids)

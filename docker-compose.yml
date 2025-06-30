@@ -8,3 +8,7 @@ services:
       - GUILD_ID=${GUILD_ID}
       - BOT_CHANNEL_ID=${BOT_CHANNEL_ID}
       - ADMIN_ROLE_ID=${ADMIN_ROLE_ID}
+    volumes:
+      - type: bind
+        source: "./config.json"
+        target: "/opt/boonbot/config.json"
