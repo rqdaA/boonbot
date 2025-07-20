@@ -177,7 +177,11 @@ async def end_ctf(ctx: discord.Interaction):
 
 @new_ctf.autocomplete("role_name")
 async def autocomplete(ctx: discord.Interaction, current: str) -> list[discord.app_commands.Choice[str]]:
-    return [app_commands.Choice(name=name, value=name) for name in config.team_names if current.lower() in name.lower()]
+    roles = [ctx.guild.get_role(role_id) for role_id in config.team_role_ids]
+    return sorted(
+        [discord.app_commands.Choice(name=role.name, value=role.name) for role in roles if current in role.name],
+        key=lambda choice: choice.name,
+    )
 
 
 @client.event
