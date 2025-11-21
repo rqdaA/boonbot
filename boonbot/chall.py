@@ -7,7 +7,7 @@ from discord.ui import Button, View
 
 from . import util, perm
 from .config import config
-from .main import tree, client, CHECK_EMOJI, SOLVED_PREFIX, RUNNING_EMOJI, JOIN_EMOJI
+from .main import tree, client, CHECK_EMOJI, SOLVED_PREFIX, RUNNING_EMOJI, JOIN_EMOJI, ERROR_EMOJI
 
 auto_join_users: Dict[int, Set[int]] = {}
 
@@ -104,7 +104,10 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, need_
     if not await util.check_is_in_bot_cmd(ctx):
         return
     else:
-        role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))[0]
+        role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))
+        if len(role) == 0:
+            await ctx.response.send_message(f"指定されたロール名は存在しないよ！{ERROR_EMOJI}", ephemeral=True)
+            return
         team_name = util.get_team_name_by_role(role)
         category_id = util.get_category_by_role(role)
         if need_reaction:
