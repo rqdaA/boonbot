@@ -108,6 +108,7 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, need_
         if len(role) == 0:
             await ctx.response.send_message(f"指定されたロール名は存在しないよ！{ERROR_EMOJI}", ephemeral=True)
             return
+        role = role[0]
         team_name = util.get_team_name_by_role(role)
         category_id = util.get_category_by_role(role)
         if need_reaction:
