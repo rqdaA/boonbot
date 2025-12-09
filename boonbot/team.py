@@ -50,8 +50,7 @@ async def add_team(
     config.save_to_file()
 
     await ctx.response.send_message(
-        f"チーム '{team_name}' を追加しました {CHECK_EMOJI}\n"
-        f"カテゴリ: {contests_category.name}, ロール: {team_role.name}",
+        f"チーム '{team_name}' を追加しました {CHECK_EMOJI}\n" f"カテゴリ: {contests_category.name}, ロール: {team_role.name}",
         ephemeral=True,
     )
 
