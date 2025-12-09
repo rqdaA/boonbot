@@ -3,7 +3,7 @@ from discord import app_commands
 
 from . import util
 from .config import config
-from .main import tree, CHECK_EMOJI, ERROR_EMOJI
+from .main import CHECK_EMOJI, ERROR_EMOJI, tree
 from .util import has_admin_role
 
 team = app_commands.Group(name="team", description="チーム管理コマンド")
@@ -50,7 +50,8 @@ async def add_team(
     config.save_to_file()
 
     await ctx.response.send_message(
-        f"チーム '{team_name}' を追加しました {CHECK_EMOJI}\n" f"カテゴリ: {contests_category.name}, ロール: {team_role.name}",
+        f"チーム '{team_name}' を追加しました {CHECK_EMOJI}\n"
+        f"カテゴリ: {contests_category.name}, ロール: {team_role.name}",
         ephemeral=True,
     )
 
@@ -81,7 +82,8 @@ async def remove_team(ctx: discord.Interaction, team_name: str):
     config.save_to_file()
 
     await ctx.response.send_message(
-        f"チーム '{team_name}' を削除しました {CHECK_EMOJI}\n" f"カテゴリ: {category_name}, ロール: {role_name}", ephemeral=True
+        f"チーム '{team_name}' を削除しました {CHECK_EMOJI}\n" f"カテゴリ: {category_name}, ロール: {role_name}",
+        ephemeral=True,
     )
 
 

@@ -1,13 +1,21 @@
 import enum
-from typing import Dict, List, Set
+from typing import Dict, Set
 
 import discord
-from discord import ChannelType, app_commands
+from discord import ChannelType
 from discord.ui import Button, View
 
-from . import util, perm
+from . import perm, util
 from .config import config
-from .main import tree, client, CHECK_EMOJI, SOLVED_PREFIX, RUNNING_EMOJI, JOIN_EMOJI, ERROR_EMOJI
+from .main import (
+    CHECK_EMOJI,
+    ERROR_EMOJI,
+    JOIN_EMOJI,
+    RUNNING_EMOJI,
+    SOLVED_PREFIX,
+    client,
+    tree,
+)
 
 auto_join_users: Dict[int, Set[int]] = {}
 

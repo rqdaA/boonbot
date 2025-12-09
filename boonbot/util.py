@@ -2,7 +2,7 @@ import random
 import string
 
 import discord
-from discord import TextChannel, Thread, CategoryChannel, app_commands
+from discord import CategoryChannel, TextChannel, Thread, app_commands
 
 from .config import config
 from .main import ERROR_EMOJI, SOLVED_PREFIX

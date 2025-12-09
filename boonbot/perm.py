@@ -1,8 +1,6 @@
 import discord
-from discord import Role
 
 from . import util
-from .config import config
 from .main import tree
 from .util import check_is_in_bot_cmd, check_is_in_contest_channel, get_contest_channels
 

@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import discord
 from discord import app_commands
 
-from .config import config, CONFIG_FILE
+from .config import CONFIG_FILE, config
 
 intents = discord.Intents.default()
 intents.members = True
@@ -30,7 +30,7 @@ async def commands_help(ctx: discord.Interaction):
 ## 利用可能なコマンド一覧
 - help
 - new-ctf
-- new-chall 
+- new-chall
 - rename-chall
 - join
 - leave
