@@ -17,6 +17,9 @@ from .main import (
     tree,
 )
 
+RUNNING_CTF_POS = 1
+END_CTF_POS = 2
+
 auto_join_users: Dict[int, Set[int]] = {}
 
 
@@ -119,6 +122,7 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, need_
         role = role[0]
         team_name = util.get_team_name_by_role(role)
         category_id = util.get_category_by_role(role)
+        category = ctx.guild.get_channel(category_id)
         if need_reaction:
             overwrites = {
                 ctx.guild.default_role: perm.PERMISSION_DENY,
@@ -131,9 +135,9 @@ async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, need_
 
         channel = await ctx.guild.create_text_channel(
             f"{RUNNING_EMOJI}{ctf_name}",
-            category=ctx.guild.get_channel(category_id),
+            category=category,
             overwrites=overwrites,
-            position=0,
+            position=RUNNING_CTF_POS,
         )
         await channel.send(
             f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`",
@@ -154,15 +158,17 @@ async def unend_ctf(ctx: discord.Interaction):
     if not await util.check_is_in_contest_channel(ctx):
         return
 
-    for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
-        if ch.name.startswith(RUNNING_EMOJI):
-            continue
-        team_role = ctx.guild.get_role(util.get_role_by_category(ch.category))
-        await ch.set_permissions(team_role, overwrite=perm.PERMISSION_WHITE)
-        await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DENY)
-        await ch.edit(name=f"{RUNNING_EMOJI}{ch.name}")
-        if ch.id != ctx.channel.id:
-            await ch.send(f"ロール制限を付けました {CHECK_EMOJI}")
+    ch = ctx.channel
+    if ch.name.startswith(RUNNING_EMOJI):
+        await ctx.response.send_message(f"まだ終了していないCTFだよ！ {ERROR_EMOJI}", ephemeral=True)
+    category = ch.category
+    team_role = ctx.guild.get_role(util.get_role_by_category(category))
+    await ch.set_permissions(team_role, overwrite=perm.PERMISSION_WHITE)
+    await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DENY)
+    await ch.edit(name=f"{RUNNING_EMOJI}{ch.name}")
+    if ch.id != ctx.channel.id:
+        await ch.send(f"ロール制限を付けました {CHECK_EMOJI}")
+    await ch.edit(position=RUNNING_CTF_POS)
     await ctx.response.send_message(f"ロール制限を付けました {CHECK_EMOJI}")
 
 
@@ -171,19 +177,21 @@ async def end_ctf(ctx: discord.Interaction):
     if not await util.check_is_in_contest_channel(ctx):
         return
 
-    for ch in [_ch for _ch in ctx.guild.channels if _ch.name == ctx.channel.name]:
-        if not ch.name.startswith(RUNNING_EMOJI):
-            continue
-        team_role = ctx.guild.get_role(util.get_role_by_category(ch.category))
-        non_bot_member = list(filter(lambda u: not u.bot, ctx.guild.members))
-        whitelisted_members = list(filter(lambda u: ch.overwrites_for(u).read_messages, non_bot_member))
-        await ch.edit(name=ch.name.lstrip(RUNNING_EMOJI))
-        for member in whitelisted_members:
-            await ch.set_permissions(member, overwrite=perm.PERMISSION_DEFAULT)
-        await ch.set_permissions(team_role, overwrite=perm.PERMISSION_DEFAULT)
-        await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
-        if ch.id != ctx.channel.id:
-            await ch.send(f"ロール制限を外しました {CHECK_EMOJI}")
+    ch = ctx.channel
+    if not ch.name.startswith(RUNNING_EMOJI):
+        await ctx.response.send_message(f"すでに終了しているCTFだよ！ {ERROR_EMOJI}", ephemeral=True)
+    team_role = ctx.guild.get_role(util.get_role_by_category(ch.category))
+    non_bot_member = list(filter(lambda u: not u.bot, ctx.guild.members))
+    whitelisted_members = list(filter(lambda u: ch.overwrites_for(u).read_messages, non_bot_member))
+    await ch.edit(name=ch.name.lstrip(RUNNING_EMOJI))
+    for member in whitelisted_members:
+        await ch.set_permissions(member, overwrite=perm.PERMISSION_DEFAULT)
+    await ch.set_permissions(team_role, overwrite=perm.PERMISSION_DEFAULT)
+    await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
+    if ch.id != ctx.channel.id:
+        await ch.send(f"ロール制限を外しました {CHECK_EMOJI}")
+    pos = max(END_CTF_POS, len(ch.category.channels))
+    await ch.edit(position=pos)
     await ctx.response.send_message(f"ロール制限を外しました {CHECK_EMOJI}")
 
 
