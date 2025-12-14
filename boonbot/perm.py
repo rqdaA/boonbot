@@ -12,7 +12,7 @@ JOIN_MARK = ":heart:"
 
 
 @tree.command(name="leave", description="現在のコンテストチャンネルから離脱します")
-async def leave(ctx: discord.Interaction, channel: discord.TextChannel = None):
+async def leave(ctx: discord.Interaction, channel: discord.TextChannel):
     if channel:
         if not await check_is_in_bot_cmd(ctx):
             return
@@ -23,7 +23,7 @@ async def leave(ctx: discord.Interaction, channel: discord.TextChannel = None):
             return
         await ctx.channel.set_permissions(ctx.user, overwrite=PERMISSION_DENY)
         await ctx.channel.send(f"{ctx.user.mention} が離脱しました {LEAVE_MARK}")
-    await ctx.response.send_message(f"{channel.mention} から離脱しました {LEAVE_MARK}", ephemeral=True)
+    await ctx.response.send_message(f"チャンネルから離脱しました {LEAVE_MARK}", ephemeral=True)
 
 
 @tree.command(name="join", description="コンテストチャンネルに復帰します")
