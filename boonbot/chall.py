@@ -114,42 +114,41 @@ async def unsolved(ctx: discord.Interaction):
 async def new_ctf(ctx: discord.Interaction, ctf_name: str, role_name: str, need_reaction: bool = False):
     if not await util.check_is_in_bot_cmd(ctx):
         return
+    role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))
+    if len(role) == 0:
+        await ctx.response.send_message(f"指定されたロール名は存在しないよ！{ERROR_EMOJI}", ephemeral=True)
+        return
+    role = role[0]
+    team_name = util.get_team_name_by_role(role)
+    category_id = util.get_category_by_role(role)
+    category = ctx.guild.get_channel(category_id)
+    if need_reaction:
+        overwrites = {
+            ctx.guild.default_role: perm.PERMISSION_DENY,
+        }
     else:
-        role = list(filter(lambda _role: _role.name == role_name, ctx.guild.roles))
-        if len(role) == 0:
-            await ctx.response.send_message(f"指定されたロール名は存在しないよ！{ERROR_EMOJI}", ephemeral=True)
-            return
-        role = role[0]
-        team_name = util.get_team_name_by_role(role)
-        category_id = util.get_category_by_role(role)
-        category = ctx.guild.get_channel(category_id)
-        if need_reaction:
-            overwrites = {
-                ctx.guild.default_role: perm.PERMISSION_DENY,
-            }
-        else:
-            overwrites = {
-                ctx.guild.default_role: perm.PERMISSION_DENY,
-                role: perm.PERMISSION_WHITE,
-            }
+        overwrites = {
+            ctx.guild.default_role: perm.PERMISSION_DENY,
+            role: perm.PERMISSION_WHITE,
+        }
 
-        channel = await ctx.guild.create_text_channel(
-            f"{RUNNING_EMOJI}{ctf_name}",
-            category=category,
-            overwrites=overwrites,
-            position=RUNNING_CTF_POS,
-        )
-        await channel.send(
-            f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`",
-            view=AutoJoinButton(),
-        )
-        resp_text = f"{role_name}に{ctf_name} ({channel.mention}) を作成しました {CHECK_EMOJI}"
-        if need_reaction:
-            await ctx.response.defer()
-            msg = await ctx.followup.send(f"{resp_text}\n参加するには{JOIN_EMOJI}を押してください")
-            await msg.add_reaction(JOIN_EMOJI)
-        else:
-            await ctx.response.send_message(resp_text)
+    channel = await ctx.guild.create_text_channel(
+        f"{RUNNING_EMOJI}{ctf_name}",
+        category=category,
+        overwrites=overwrites,
+        position=RUNNING_CTF_POS,
+    )
+    await channel.send(
+        f"team name: `{team_name}`\npassword: `{util.gen_password(16)}`",
+        view=AutoJoinButton(),
+    )
+    resp_text = f"{role_name}に{ctf_name} ({channel.mention}) を作成しました {CHECK_EMOJI}"
+    if need_reaction:
+        await ctx.response.defer()
+        msg = await ctx.followup.send(f"{resp_text}\n参加するには{JOIN_EMOJI}を押してください")
+        await msg.add_reaction(JOIN_EMOJI)
+    else:
+        await ctx.response.send_message(resp_text)
 
 
 # TODO: need_reaction==TrueなCTFでunendをした時に閲覧制限の再設定がうまく行かない問題を解決
@@ -161,6 +160,7 @@ async def unend_ctf(ctx: discord.Interaction):
     ch = ctx.channel
     if ch.name.startswith(RUNNING_EMOJI):
         await ctx.response.send_message(f"まだ終了していないCTFだよ！ {ERROR_EMOJI}", ephemeral=True)
+    await ctx.response.defer()
     category = ch.category
     team_role = ctx.guild.get_role(util.get_role_by_category(category))
     await ch.set_permissions(team_role, overwrite=perm.PERMISSION_WHITE)
@@ -169,7 +169,7 @@ async def unend_ctf(ctx: discord.Interaction):
     if ch.id != ctx.channel.id:
         await ch.send(f"ロール制限を付けました {CHECK_EMOJI}")
     await ch.edit(position=RUNNING_CTF_POS)
-    await ctx.response.send_message(f"ロール制限を付けました {CHECK_EMOJI}")
+    await ctx.followup.send(f"ロール制限を付けました {CHECK_EMOJI}")
 
 
 @tree.command(name="end-ctf", description="コンテストの閲覧制限を外します")
@@ -180,6 +180,7 @@ async def end_ctf(ctx: discord.Interaction):
     ch = ctx.channel
     if not ch.name.startswith(RUNNING_EMOJI):
         await ctx.response.send_message(f"すでに終了しているCTFだよ！ {ERROR_EMOJI}", ephemeral=True)
+    await ctx.response.defer()
 
     for member, ow in ch.overwrites.items():
         if not isinstance(member, discord.Member):
@@ -191,7 +192,7 @@ async def end_ctf(ctx: discord.Interaction):
     await ch.set_permissions(team_role, overwrite=perm.PERMISSION_DEFAULT)
     await ch.set_permissions(ctx.guild.default_role, overwrite=perm.PERMISSION_DEFAULT)
     await ch.edit(position=max(END_CTF_POS, len(ch.category.channels)))
-    await ctx.response.send_message(f"ロール制限を外しました {CHECK_EMOJI}")
+    await ctx.followup.send(f"ロール制限を外しました {CHECK_EMOJI}")
 
 
 @new_ctf.autocomplete("role_name")
