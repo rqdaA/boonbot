@@ -6,6 +6,7 @@ from discord import app_commands
 
 from .config import CONFIG_FILE, config
 
+discord.utils.setup_logging(level=logging.INFO)
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -15,6 +16,7 @@ intents.messages = True
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 SOLVED_PREFIX = "🚩 "
 CHECK_EMOJI = "✅"
