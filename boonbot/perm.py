@@ -12,7 +12,7 @@ JOIN_MARK = ":heart:"
 
 
 @tree.command(name="leave", description="現在のコンテストチャンネルから離脱します")
-async def leave(ctx: discord.Interaction, channel: discord.TextChannel):
+async def leave(ctx: discord.Interaction, channel: discord.TextChannel = None):
     if channel:
         if not await check_is_in_bot_cmd(ctx):
             return
