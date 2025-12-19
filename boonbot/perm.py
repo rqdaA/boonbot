@@ -63,18 +63,18 @@ async def whitelist(
             continue
         added.append(member)
         await ctx.channel.set_permissions(member, overwrite=PERMISSION_WHITE)
-    if len(whitelisted_members) == 0:
-        # Channel is Not Whitelisted
+
+    is_already_whitelist = not ctx.channel.overwrites_for(team_role).read_messages
+
+    if ctx.channel.overwrites_for(team_role).read_messages:
         await ctx.channel.set_permissions(team_role, overwrite=PERMISSION_DENY)
-        mentions = " ".join(member.mention for member in whitelisted_members + added if member in target_members)
-        await ctx.response.send_message(f"ホワイトリストに変更しました\nメンバー:{mentions}")
-    else:
-        # Channel is Already Whitelisted
-        if len(added) == 0:
-            await ctx.response.send_message("そのメンバーはすでにホワイトリストに入っています", ephemeral=True)
-            return
+
+    if is_already_whitelist:
         mentions = " ".join(member.mention for member in added if member in target_members)
         await ctx.response.send_message(f"{mentions}をホワイトリストに追加しました")
+    else:
+        mentions = " ".join(member.mention for member in whitelisted_members + added if member in target_members)
+        await ctx.response.send_message(f"ホワイトリストに変更しました\nメンバー:{mentions}")
 
 
 @tree.command(name="unwhitelist", description="ホワイトリストを解除します")
